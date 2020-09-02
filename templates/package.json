@@ -1,0 +1,19 @@
+{
+  "name": "zero-be-nodejs",
+  "version": "1.0.0",
+  "description": "Example backend Nodejs project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.744.0",
+    "express": "^4.17.1",
+    "express-busboy": "^8.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.8.1"
+  }
+}

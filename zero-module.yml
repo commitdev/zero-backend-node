@@ -1,0 +1,80 @@
+name: zero-deployable-backend
+description: 'zero module for a basic backend service running in kubernetes'
+author: 'Commit'
+
+dependsOn:
+- zero-aws-eks-stack
+
+template:
+  strictMode: true
+  delimiters:
+    - '<%'
+    - '%>'
+  inputDir: 'templates'
+  outputDir: 'backend-service'
+
+requiredCredentials:
+  - aws
+  - circleci
+  - github
+
+parameters:
+  - field: region
+    label: Select AWS Region
+    options:
+      - "us-west-2"
+      - "us-east-1"
+      - "us-east-2"
+  - field: productionHostRoot
+    label: Production Root Host Name (e.g. mydomain.com) - this must be the root of the chosen domain, not a subdomain.
+    fieldValidation:
+      type: regex
+      value: '^([a-z0-9]+(-[a-z0-9]+)*\.{1})+[a-z]{2,}$'
+      errorMessage: Invalid root domain name
+  - field: productionFrontendSubdomain
+    label: Production Frontend Host Name (e.g. app.)
+    default: app.
+    fieldValidation:
+      type: regex
+      value: '^([a-z0-9]+(-[a-z0-9]+)*\.)$'
+      errorMessage: Invalid subdomain (cannot contain special chars & must end with a '.')
+  - field: productionBackendSubdomain
+    label: Production Backend Host Name (e.g. api.)
+    default: api.
+    fieldValidation:
+      type: regex
+      value: '^([a-z0-9]+(-[a-z0-9]+)*\.)$'
+      errorMessage: Invalid subdomain (cannot contain special chars & must end with a '.')
+  - field: stagingHostRoot
+    label: Staging Root Host Name (e.g. mydomain-staging.com) - this must be the root of the chosen domain, not a subdomain.
+    fieldValidation:
+      type: regex
+      value: '^([a-z0-9]+(-[a-z0-9]+)*\.{1})+[a-z]{2,}$'
+      errorMessage: Invalid root domain name
+  - field: stagingFrontendSubdomain
+    label: Staging Frontend Host Name (e.g. app.)
+    default: app.
+    fieldValidation:
+      type: regex
+      value: '^([a-z0-9]+(-[a-z0-9]+)*\.)$'
+      errorMessage: Invalid subdomain (cannot contain special chars & must end with a '.')
+  - field: stagingBackendSubdomain
+    label: Staging Backend Host Name (e.g. api.)
+    default: api.
+    fieldValidation:
+      type: regex
+      value: '^([a-z0-9]+(-[a-z0-9]+)*\.)$'
+      errorMessage: Invalid subdomain (cannot contain special chars & must end with a '.')
+  - field: database
+    label: Database engine to use (postgres)
+    options:
+      - "postgres"
+      - "mysql"
+  - field: accountId
+    label: AWS Account ID
+    execute: aws sts get-caller-identity --query "Account" | tr -d '"'
+  - field: randomSeed
+    label: Random seed that will be shared between projects to come up with deterministic resource names
+    execute: uuidgen | head -c 8
+  - field: databaseName
+    execute: echo "$projectName"| sed "s/[- ]//g"
