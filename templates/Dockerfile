@@ -1,11 +1,6 @@
-FROM golang:1.13.7-alpine3.11 as builder
+FROM node:14.9-alpine
 WORKDIR /app
 COPY . .
-RUN go build -o <% .Name %> main.go
-
-FROM alpine:3.11
-RUN apk add --update bash ca-certificates
-WORKDIR /app
-COPY --from=builder /app/<% .Name %> .
+RUN npm i
 
 ENTRYPOINT ["/app/<% .Name %>"]

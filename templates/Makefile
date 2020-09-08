@@ -1,5 +1,5 @@
-build:
-	go build -o <% .Name %> main.go
+install:
+	npm i
 
 run:
-	SERVER_PORT=80 go run main.go
+	PORT=80 node app.js

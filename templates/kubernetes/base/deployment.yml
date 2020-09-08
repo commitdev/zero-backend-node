@@ -22,10 +22,9 @@ spec:
               memory: 256Mi
               cpu: 0.5
           livenessProbe:
-            exec:
-              command:
-              - rm
-              - /tmp/service-alive
+            httpGet:
+              port: http
+              path: /status/alive
             initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
@@ -58,6 +57,16 @@ spec:
                 secretKeyRef:
                   name: <% .Name %>
                   key: DATABASE_PASSWORD
+          - name: CF_KEYPAIR_ID
+            valueFrom:
+                secretKeyRef:
+                  name: cf_keypair
+                  key: keypair_id
+          - name: CF_KEYPAIR_SECRET_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: cf_keypair
+                  key: secret_key
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
