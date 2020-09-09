@@ -60,12 +60,12 @@ spec:
           - name: CF_KEYPAIR_ID
             valueFrom:
                 secretKeyRef:
-                  name: cf_keypair
+                  name: cf-keypair
                   key: keypair_id
           - name: CF_KEYPAIR_SECRET_KEY
             valueFrom:
                 secretKeyRef:
-                  name: cf_keypair
+                  name: cf-keypair
                   key: secret_key
 ---
 apiVersion: autoscaling/v1
