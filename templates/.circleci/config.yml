@@ -1,6 +1,7 @@
 ---
 version: 2.1
 orbs:
+  node: circleci/node@3.0.1
   aws-ecr: circleci/aws-ecr@6.5.0
   aws-eks: circleci/aws-eks@0.2.3
   aws-s3: circleci/aws-s3@1.0.11
@@ -12,7 +13,7 @@ orbs:
 variables:
   - &workspace /home/circleci/project
 
-  - &build-image cimg/go:1.13
+  - &build-image cimg/node:14.10
 
 
 aliases:
@@ -111,30 +112,30 @@ jobs:
     steps: # steps that comprise the `build` job
       - attach_workspace:
           at: *workspace
-      - restore_cache: # restores saved cache if no changes are detected since last run
-          keys:
-            - v1-pkg-cache-{{ checksum "go.sum" }}
-            - v1-pkg-cache-
+      - node/install-packages:
+          cache-path: "./node_modules"
+          app-dir: .
       - run:
-          name: Run unit tests
-          command: |
-            go get -u github.com/jstemmer/go-junit-report
-            mkdir -p test-reports
-            go test -v ./... | go-junit-report > test-reports/junit.xml
-
-      - save_cache: # Store cache in the /go/pkg directory
-          key: v1-pkg-cache-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg"
-
+          name: Generating env file
+          command: cp .env.example .env
       - store_test_results:
           path: test-reports
-
       - store_artifacts:
           path: test-reports
 
       # Requires the SLACK_WEBHOOK env var to be set
       #- slack/notify-on-failure
+  lint:
+    docker:
+      - image: *build-image
+    working_directory: *workspace
+    steps:
+      - attach_workspace:
+          at: *workspace
+      - node/install-packages:
+          cache-path: "./node_modules"
+          app-dir: .
+      - run: npm run lint
 
   build_and_push:
     machine:

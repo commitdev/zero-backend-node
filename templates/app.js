@@ -1,8 +1,10 @@
 var aws = require('aws-sdk');
 var cfsign = require('aws-cloudfront-sign');
 var express = require('express');
+var morgan = require('morgan');
 
 var app = express();
+app.use(morgan('combined'));
 var s3 = new aws.S3();
 
 app.get('/presigned/:key', (req, res) => {
@@ -32,7 +34,7 @@ app.get('/:key', (req, res) => {
     };
 
     var url = cfsign.getSignedUrl(
-        `https://files.commit.dev/${req.params.key}`,
+        `https://files.<% DOMAIN_HERE %>/${req.params.key}`,
         params
     );
 
@@ -54,7 +56,7 @@ app.get('/status/about', (req, res) => {
     });
 });
 
-var port = process.env.PORT;
+var port = process.env.SERVER_PORT;
 if (!port) {
     port = 3000;
 }
