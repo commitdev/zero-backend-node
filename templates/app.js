@@ -34,7 +34,7 @@ app.get('/:key', (req, res) => {
     };
 
     var url = cfsign.getSignedUrl(
-        `https://files.<% DOMAIN_HERE %>/${req.params.key}`,
+        `https://files.${process.env.DOMAIN}/${req.params.key}`,
         params
     );
 

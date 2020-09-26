@@ -57,8 +57,12 @@ spec:
                 secretKeyRef:
                   name: cf-keypair
                   key: private_key
+          - name: DOMAIN
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.domain # TODO: Not sure how to pass this through
           - name: S3_BUCKET
-            value: "files.<% DOMAIN_HERE %>"
+            value: "files.$(DOMAIN)"
           - name: AWS_REGION
             value: "<% index .Params `region` %>"
 ---
