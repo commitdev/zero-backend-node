@@ -14,4 +14,4 @@ configMapGenerator:
   behavior: merge
   literals:
     - ENVIRONMENT=production
-    - DOMAIN=<% .index .Params `productionHostRoot` %>
+    - DOMAIN=<% index .Params `productionHostRoot` %>
