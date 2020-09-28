@@ -14,6 +14,7 @@ configMapGenerator:
     - DATABASE_PORT=<%if eq (index .Params `database`) "postgres" %>5432<% else if eq (index .Params `database`) "mysql" %>3306<% end %>
     - DATABASE_NAME=<% index .Params `databaseName` %>
     - SERVICE_PORT=80
+    - AWS_REGION=<% index .Params `region` %>
 
 commonLabels:
   app: <% .Name %>

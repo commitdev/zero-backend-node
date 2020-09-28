@@ -14,3 +14,4 @@ configMapGenerator:
   literals:
     - ENVIRONMENT=staging
     - DOMAIN=<% index .Params `stagingHostRoot` %>
+    - S3_BUCKET=files.<% index .Params `stagingHostRoot` %>
