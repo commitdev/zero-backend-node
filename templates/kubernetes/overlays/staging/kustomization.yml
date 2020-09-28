@@ -13,3 +13,4 @@ configMapGenerator:
   behavior: merge
   literals:
     - ENVIRONMENT=staging
+    - DOMAIN=<% .index .Params `stagingHostRoot` %>
