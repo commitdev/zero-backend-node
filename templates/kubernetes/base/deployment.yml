@@ -57,10 +57,6 @@ spec:
                 secretKeyRef:
                   name: cf-keypair
                   key: private_key
-          - name: S3_BUCKET
-            value: "files.$(DOMAIN)"
-          - name: AWS_REGION
-            value: "<% index .Params `region` %>"
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
