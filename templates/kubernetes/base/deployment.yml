@@ -47,16 +47,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          - name: DATABASE_USERNAME
-            valueFrom:
-                secretKeyRef:
-                  name: <% .Name %>
-                  key: DATABASE_USERNAME
-          - name: DATABASE_PASSWORD
-            valueFrom:
-                secretKeyRef:
-                  name: <% .Name %>
-                  key: DATABASE_PASSWORD
           - name: CF_KEYPAIR_ID
             valueFrom:
                 secretKeyRef:

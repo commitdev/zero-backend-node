@@ -14,3 +14,5 @@ configMapGenerator:
   behavior: merge
   literals:
     - ENVIRONMENT=production
+    - DOMAIN=<% index .Params `productionHostRoot` %>
+    - S3_BUCKET=files.<% index .Params `productionHostRoot` %>
