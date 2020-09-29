@@ -9,4 +9,4 @@ FROM node:14-alpine
 WORKDIR /app
 COPY --from=base /app /app
 
-CMD ["node", "app.js"]
+CMD ["node", "src/app.js"]
