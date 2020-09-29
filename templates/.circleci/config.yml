@@ -244,8 +244,13 @@ workflows:
       jobs:
         - checkout_code
 
+        - lint:
+            requires:
+              - checkout_code
+
         - unit_test:
             requires:
+              - lint
               - checkout_code
 
         - build_and_push:
