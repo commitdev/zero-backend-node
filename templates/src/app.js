@@ -3,6 +3,8 @@ var cfsign = require("aws-cloudfront-sign");
 var express = require("express");
 var morgan = require("morgan");
 
+var { connect } = require("./db");
+
 var app = express();
 app.use(morgan("combined"));
 var s3 = new aws.S3();
@@ -61,6 +63,20 @@ if (!port) {
   port = 3000;
 }
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+async function main() {
+  const database = await connect();
+
+  // remove this block for development, just for verifying DB
+  try {
+    const res = await database.query("SELECT 1");
+    console.log(`Query successful, returned ${res[0].length} rows.`);
+  }catch (e){
+    console.error(e);
+  }
+
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
+  });
+}
+
+main();
