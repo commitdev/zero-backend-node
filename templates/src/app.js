@@ -70,7 +70,7 @@ async function main() {
   try {
     const res = await database.query("SELECT 1");
     console.log(`Query successful, returned ${res[0].length} rows.`);
-  }catch (e){
+  } catch (e) {
     console.error(e);
   }
 
