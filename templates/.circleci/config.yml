@@ -112,9 +112,16 @@ jobs:
     steps: # steps that comprise the `build` job
       - attach_workspace:
           at: *workspace
-      - node/install-packages:
-          cache-path: "./node_modules"
-          app-dir: .
+      ## This `npm i --package-lock` step is used so boilerplate can pick up latest version before locking
+      ## and also allow variances of database drivers to be not part of the package-lock.json
+      ## Once you commit your package-lock.json you can retire this step for the cached version
+      ## 1. remove npm i --package-lock step
+      ## 2. use the commented node/install-packages instead
+      - run:
+          command: npm install
+      # - node/install-packages:
+      #     cache-path: "./node_modules"
+      #     app-dir: .
       - run:
           name: Generating env file
           command: cp .env.example .env
@@ -132,9 +139,16 @@ jobs:
     steps:
       - attach_workspace:
           at: *workspace
-      - node/install-packages:
-          cache-path: "./node_modules"
-          app-dir: .
+      ## This `npm i --package-lock` step is used so boilerplate can pick up latest version before locking
+      ## and also allow variances of database drivers to be not part of the package-lock.json
+      ## Once you commit your package-lock.json you can retire this step for the cached version
+      ## 1. remove npm i --package-lock step
+      ## 2. use the commented node/install-packages instead
+      - run:
+          command: npm install
+      # - node/install-packages:
+      #     cache-path: "./node_modules"
+      #     app-dir: .
       - run: npm run lint
 
   build_and_push:
