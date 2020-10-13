@@ -112,7 +112,7 @@ jobs:
     steps: # steps that comprise the `build` job
       - attach_workspace:
           at: *workspace
-      ## This `npm i --package-lock` step is used so boilerplate can pick up latest version before locking
+      ## This `npm install` step is used so boilerplate can pick up latest version before locking
       ## and also allow variances of database drivers to be not part of the package-lock.json
       ## Once you commit your package-lock.json you can retire this step for the cached version
       ## 1. remove npm i --package-lock step
@@ -139,7 +139,7 @@ jobs:
     steps:
       - attach_workspace:
           at: *workspace
-      ## This `npm i --package-lock` step is used so boilerplate can pick up latest version before locking
+      ## This `npm install` step is used so boilerplate can pick up latest version before locking
       ## and also allow variances of database drivers to be not part of the package-lock.json
       ## Once you commit your package-lock.json you can retire this step for the cached version
       ## 1. remove npm i --package-lock step
