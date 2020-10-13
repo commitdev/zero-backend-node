@@ -47,7 +47,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          - name: CF_KEYPAIR_ID
+<% if eq (index .Params `fileUploads`) "yes" %>          - name: CF_KEYPAIR_ID
             valueFrom:
                 secretKeyRef:
                   name: cf-keypair
@@ -57,7 +57,7 @@ spec:
                 secretKeyRef:
                   name: cf-keypair
                   key: private_key
-          - name: DATABASE_USERNAME
+<% end %>          - name: DATABASE_USERNAME
             valueFrom:
                 secretKeyRef:
                   name: <% .Name %>
