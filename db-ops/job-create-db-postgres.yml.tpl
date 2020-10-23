@@ -9,8 +9,9 @@ metadata:
   name: db-create-users
   namespace: db-ops
 type: Opaque
-stringData:
+stringData: 
   create-user.sql: |
+    drop user $DB_APP_USERNAME
     create user $DB_APP_USERNAME with encrypted password '$DB_APP_PASSWORD';
     grant all privileges on database $DB_NAME to $DB_APP_USERNAME;
   RDS_MASTER_PASSWORD: $SECRET_PASSWORD
@@ -26,14 +27,14 @@ metadata:
   name: $PROJECT_NAME
   namespace: $PROJECT_NAME
 type: Opaque
-stringData:
+stringData: 
   DATABASE_USERNAME: $DB_APP_USERNAME
   DATABASE_PASSWORD: $DB_APP_PASSWORD
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-create-users
+  name: db-create-users-$JOB_ID
   namespace: db-ops
 spec:
   template:
@@ -41,10 +42,10 @@ spec:
       containers:
       - name: create-rds-user
         image: $DOCKER_IMAGE_TAG
-        command:
+        command: 
         - sh
-        args:
-        - '-c'
+        args: 
+        - '-c' 
         - psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT $DB_NAME -a -f/db-ops/create-user.sql > /dev/null
         env:
         - name: PGPASSWORD
@@ -83,7 +84,7 @@ spec:
       containers:
       - command:
         - sh
-        args:
+        args: 
         - "-c"
         # long running task so the pod doesn't exit with 0
         - tail -f /dev/null

@@ -9,8 +9,9 @@ metadata:
   name: db-create-users
   namespace: db-ops
 type: Opaque
-stringData:
+stringData: 
   create-user.sql: |
+    DROP USER '$DB_APP_USERNAME';
     CREATE USER '$DB_APP_USERNAME' IDENTIFIED BY '$DB_APP_PASSWORD';
     GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_APP_USERNAME';
   RDS_MASTER_PASSWORD: $SECRET_PASSWORD
@@ -26,14 +27,14 @@ metadata:
   name: $PROJECT_NAME
   namespace: $PROJECT_NAME
 type: Opaque
-stringData:
+stringData: 
   DATABASE_USERNAME: $DB_APP_USERNAME
   DATABASE_PASSWORD: $DB_APP_PASSWORD
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-create-users
+  name: db-create-users-$JOB_ID
   namespace: db-ops
 spec:
   template:
@@ -41,10 +42,10 @@ spec:
       containers:
       - name: create-rds-user
         image: $DOCKER_IMAGE_TAG
-        command:
+        command: 
         - sh
-        args:
-        - '-c'
+        args: 
+        - '-c' 
         - mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT $DB_NAME < /db-ops/create-user.sql
         env:
         - name: DB_ENDPOINT
@@ -87,7 +88,7 @@ spec:
       containers:
       - command:
         - sh
-        args:
+        args: 
         - "-c"
         # long running task so the pod doesn't exit with 0
         - tail -f /dev/null
