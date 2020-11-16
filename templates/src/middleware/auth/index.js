@@ -4,9 +4,8 @@ const authMiddleware = (req, res, next) => {
    *  1. X-User-Id
    *  2. X-User-Email
    * */
-  const hasKratosCookie = req.headers.cookie.match(/ory_kratos_session/);
   const hasUserData = req.headers["x-user-id"] && req.headers["x-user-email"];
-  if (!hasKratosCookie || !hasUserData) {
+  if (!hasUserData) {
     res.status(401);
     res.json({
       success: false,

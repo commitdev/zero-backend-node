@@ -4,7 +4,7 @@ var morgan = require("morgan");
 
 var { connect } = require("./db");
 const statusRoutes = require("./app/status");
-<%if eq (index .Params `fileUploads`) "yes" %>const fileUploadRoutes = require("./app/fileupload");
+<%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");
 <% end %><%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");
 <% end %>
 dotenv.config();
@@ -12,8 +12,8 @@ var app = express();
 app.use(morgan("combined"));
 
 app.use("/status", statusRoutes);
-<%if eq (index .Params `userAuth`) "yes" %>app.use("/", authRoutes);
-<% end %><%if eq (index .Params `fileUploads`) "yes" %>app.use("/", fileUploadRoutes);
+<%if eq (index .Params `userAuth`) "yes" %>app.use("/auth", authRoutes);
+<% end %><%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);
 <% end %>
 var port = process.env.SERVER_PORT;
 if (!port) {
