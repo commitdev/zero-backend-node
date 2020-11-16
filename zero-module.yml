@@ -96,7 +96,7 @@ conditions:
     matchField: fileUploads
     whenValue: "no"
     data:
-    - src/app/fileupload
+    - src/app/file
   - action: ignoreFile
     matchField: userAuth
     whenValue: "no"
