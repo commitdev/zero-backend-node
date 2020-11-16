@@ -93,6 +93,11 @@ parameters:
 
 conditions:
   - action: ignoreFile
+    matchField: fileUploads
+    whenValue: "no"
+    data:
+    - src/app/fileupload
+  - action: ignoreFile
     matchField: userAuth
     whenValue: "no"
     data:
