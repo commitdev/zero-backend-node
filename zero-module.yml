@@ -90,3 +90,11 @@ parameters:
     options:
       - "yes"
       - "no"
+
+conditions:
+  - action: ignoreFile
+    matchField: userAuth
+    whenValue: "no"
+    data:
+    - src/middleware/auth
+    - src/app/auth

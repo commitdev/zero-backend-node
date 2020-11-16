@@ -1,14 +1,19 @@
 var aws = require("aws-sdk");
 var cfsign = require("aws-cloudfront-sign");
+var dotenv = require("dotenv");
 var express = require("express");
 var morgan = require("morgan");
 
 var { connect } = require("./db");
-
+<%if eq (index .Params `userAuth`) "yes" %>var userAuth = require("./app/auth");
+<% end %>
+dotenv.config();
 var app = express();
 app.use(morgan("combined"));
 var s3 = new aws.S3();
-
+<%if eq (index .Params `userAuth`) "yes" %>
+app.use("/", userAuth);
+<% end %>
 app.get("/presigned/:key", (req, res) => {
   var params = {
     Bucket: process.env.S3_BUCKET,
@@ -57,29 +62,6 @@ app.get("/status/about", (req, res) => {
     podName: process.env.POD_NAME,
   });
 });
-
-<%if eq (index .Params `userAuth`) "yes" %>
-app.get('/auth-data', (req, res) => {
-  /** Expecting oathkeeper to pass on user identity in headers
-   *  (note nodejs converts all headers to lowercase)
-   *  1. X-User-Id
-   *  2. X-User-Email
-  * */
-  const hasKratosCookie = req.headers.cookie.match(/ory_kratos_session/);
-  const hasUserData = req.headers["x-user-id"] && req.headers["x-user-email"];
-  if (hasKratosCookie && hasUserData) {
-    res.json({
-      user_id: req.headers["x-user-id"],
-      email: req.headers["x-user-email"],
-    });
-  } else {
-    res.status(401);
-    res.json({
-      success: false,
-      message: "unauthenticated",
-    });
-  }
-});<% end %>
 
 var port = process.env.SERVER_PORT;
 if (!port) {
