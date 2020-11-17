@@ -7,7 +7,9 @@ patchesStrategicMerge:
 <% end %>
 resources:
 - ../../base
-<%if eq (index .Params `userAuth`) "yes" %>#<% end %>- ingress.yml
+<%if eq (index .Params `userAuth`) "yes" %>## userAuth enabled - Oathkeeper proxies to backend instead of ingress
+# - ingress.yml
+<% else %>- ingress.yml<% end %>
 
 configMapGenerator:
 - name: <% .Name %>-config
