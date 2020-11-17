@@ -8,8 +8,6 @@ patchesStrategicMerge:
 resources:
 - ../../base
 <%if eq (index .Params `userAuth`) "yes" %>#<% end %>- ingress.yml
-<%if eq (index .Params `userAuth`) "yes" %>- auth.yml
-<% end %>
 
 configMapGenerator:
 - name: <% .Name %>-config

@@ -47,7 +47,6 @@ kind: Rule
 metadata:
   name: public-backend-endpoints
 spec:
-  version: test
   upstream:
     url: http://<% .Name %>.<% .Name %>
     preserveHost: true
@@ -68,7 +67,6 @@ kind: Rule
 metadata:
   name: authenticated-backend-endpoints
 spec:
-  version: test
   upstream:
     preserveHost: true
     url: http://<% .Name %>.<% .Name %>
