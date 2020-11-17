@@ -252,7 +252,7 @@ jobs:
             cd kubernetes/overlays/<< parameters.config-environment >>
             IMAGE=<< parameters.account-id >>.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repo >>
             kustomize edit set image fake-image=${IMAGE}:${VERSION_TAG}
-            kustomize build . | kubectl apply -f -
+            kustomize build . | kubectl apply -f - -n $NAMESPACE
             if ! kubectl -n $NAMESPACE rollout status deployment/$DEPLOYMENT -w --timeout=180s ; then
               echo "$DEPLOYMENT rollout check failed:"
               echo "$DEPLOYMENT deployment:"

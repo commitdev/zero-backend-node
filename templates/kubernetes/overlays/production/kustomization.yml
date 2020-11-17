@@ -8,6 +8,7 @@ patchesStrategicMerge:
 resources:
 - ../../base
 <%if eq (index .Params `userAuth`) "yes" %>#<% end %>- ingress.yml
+- pdb.yml
 <%if eq (index .Params `userAuth`) "yes" %>- auth.yml
 <% end %>
 

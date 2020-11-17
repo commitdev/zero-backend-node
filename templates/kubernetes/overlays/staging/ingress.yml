@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: <% .Name %>
-  namespace: <% .Name %>
   annotations:
     # nginx ingress
     kubernetes.io/ingress.class: nginx
