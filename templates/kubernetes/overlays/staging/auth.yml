@@ -1,0 +1,31 @@
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: kratos-public
+spec:
+  match:
+    url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/.ory/kratos/public/<.*>
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: kratos-form-data
+spec:
+  match:
+    url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/.ory/kratos/self-service/<(login|registration|recovery|settings)>/flows<.*>
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: public-backend-endpoints
+spec:
+  match:
+    url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/<(?!(api|\.ory\/kratos)).*>
+---
+apiVersion: oathkeeper.ory.sh/v1alpha1
+kind: Rule
+metadata:
+  name: authenticated-backend-endpoints
+spec:
+  match:
+    url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/api/<.*>

@@ -103,3 +103,6 @@ conditions:
     data:
     - src/middleware/auth
     - src/app/auth
+    - kubernetes/base/auth.yml
+    - kubernetes/overlays/staging/auth.yml
+    - kubernetes/overlays/production/auth.yml
