@@ -52,7 +52,7 @@ spec:
     url: http://<% .Name %>.<% .Name %>
     preserveHost: true
   match:
-    # url: http://<backend_service_domain>/status/<.*>
+    # url: http://<backend_service_domain>/<(?!(api|\.ory\/kratos)).*>
     methods:
       - GET
       - POST
