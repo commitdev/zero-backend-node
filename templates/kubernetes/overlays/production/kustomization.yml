@@ -3,11 +3,13 @@ kind: Kustomization
 
 patchesStrategicMerge:
 - deployment.yml
-
+<%if eq (index .Params `userAuth`) "yes" %>- auth.yml
+<% end %>
 resources:
 - ../../base
-- ingress.yml
-- pdb.yml
+<%if eq (index .Params `userAuth`) "yes" %>#<% end %>- ingress.yml
+<%if eq (index .Params `userAuth`) "yes" %>- auth.yml
+<% end %>
 
 configMapGenerator:
 - name: <% .Name %>-config
