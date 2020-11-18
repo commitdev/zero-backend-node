@@ -1,28 +1,3 @@
-## Public Kratos
-# pattern: http://<proxy>/.ory/kratos/public
-# these are the entrypoint of kratos, it handles initialization of forms
-# redirections(configured in user_auth.tf from infrastructure)
-apiVersion: oathkeeper.ory.sh/v1alpha1
-kind: Rule
-metadata:
-  name: kratos-public
-spec:
-  match:
-    url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/.ory/kratos/public/<.*>
----
-## Kratos Admin
-# pattern: http://<proxy>/.ory/kratos
-# Note this only allows :GET requests
-# Once self-service flow is initiated, a flow_id is generated
-# The endpoint is used to exchange for form format / fields given a flow_id
-apiVersion: oathkeeper.ory.sh/v1alpha1
-kind: Rule
-metadata:
-  name: kratos-form-data
-spec:
-  match:
-    url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/.ory/kratos/self-service/<(login|registration|recovery|settings)>/flows<.*>
----
 ## Backend public endpoint
 # pattern: http://<proxy>/status/*
 # In example this is serves the infoPanel data, and the status endpoints that don't require user auth
