@@ -91,7 +91,6 @@ spec:
   upstream:
     preserveHost: true
     url: http://<% .Name %>.<% .Name %>
-    stripPath: /api
   match:
     # url: <backend_service_domain>/api/<.*>
     methods:

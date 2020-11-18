@@ -24,7 +24,7 @@ spec:
     url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/.ory/kratos/self-service/<(login|registration|recovery|settings)>/flows<.*>
 ---
 ## Backend public endpoint
-# pattern: http://<proxy>/<not [/.ory/kratos and /api]>
+# pattern: http://<proxy>/status/*
 # In example this is serves the infoPanel data, and the status endpoints that don't require user auth
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
@@ -32,10 +32,10 @@ metadata:
   name: public-backend-endpoints
 spec:
   match:
-    url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/<(?!(api|\.ory\/kratos)).*>
+    url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/status/<.*>
 ---
 ## Backend User-restricted endpoint
-# pattern: http://<proxy>//api
+# pattern: http://<proxy>/<not [/.ory/kratos and /status]>
 # In example this is serves the /userInfo endpoint returning the user-session's info (user_id / email)
 # Note the authenticators is `cookie_session`,
 # oathkeeper will verify the validity of session then pass along user-id/email in the Request Header
@@ -46,4 +46,5 @@ metadata:
   name: authenticated-backend-endpoints
 spec:
   match:
-    url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/api/<.*>
+    url: http://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/<(?!(status|\.ory\/kratos)).*>
+
