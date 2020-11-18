@@ -1,3 +1,7 @@
+## Public Kratos
+# pattern: http://<proxy>/.ory/kratos/public
+# these are the entrypoint of kratos, it handles initialization of forms
+# redirections(configured in user_auth.tf from infrastructure)
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
@@ -6,6 +10,11 @@ spec:
   match:
     url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/.ory/kratos/public/<.*>
 ---
+## Kratos Admin
+# pattern: http://<proxy>/.ory/kratos
+# Note this only allows :GET requests
+# Once self-service flow is initiated, a flow_id is generated
+# The endpoint is used to exchange for form format / fields given a flow_id
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
@@ -14,6 +23,9 @@ spec:
   match:
     url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/.ory/kratos/self-service/<(login|registration|recovery|settings)>/flows<.*>
 ---
+## Backend public endpoint
+# pattern: http://<proxy>/<not [/.ory/kratos and /api]>
+# In example this is serves the infoPanel data, and the status endpoints that don't require user auth
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
@@ -22,6 +34,12 @@ spec:
   match:
     url: http://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/<(?!(api|\.ory\/kratos)).*>
 ---
+## Backend User-restricted endpoint
+# pattern: http://<proxy>//api
+# In example this is serves the /userInfo endpoint returning the user-session's info (user_id / email)
+# Note the authenticators is `cookie_session`,
+# oathkeeper will verify the validity of session then pass along user-id/email in the Request Header
+# these can be configured via infra's `oathkeeper-values.yml`
 apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
