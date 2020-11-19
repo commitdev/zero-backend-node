@@ -84,3 +84,25 @@ parameters:
     options:
       - "yes"
       - "no"
+  - field: userAuth
+    label: Enable user management using Kratos and authentication using the Oathkeeper access proxy?
+    default: yes
+    options:
+      - "yes"
+      - "no"
+
+conditions:
+  - action: ignoreFile
+    matchField: fileUploads
+    whenValue: "no"
+    data:
+    - src/app/file
+  - action: ignoreFile
+    matchField: userAuth
+    whenValue: "no"
+    data:
+    - src/middleware/auth
+    - src/app/auth
+    - kubernetes/base/auth.yml
+    - kubernetes/overlays/staging/auth.yml
+    - kubernetes/overlays/production/auth.yml
