@@ -58,8 +58,8 @@ deploy-production: # or any step you would like to require Explicit approval
 ### Branch Protection
 Your repository comes with a protected branch `master` and you can edit Branch protection in **Branches** tab of Github settings. This ensures code passes tests before getting merged into your default branch.
 By default it requires `[lint, unit-test]` to be passing to allow Pull requests to merge.
-
 <% end %>
+
 ## Database credentials
 Your application is assumed[(ref)][base-deployment-secret] to rely on a database(RDS), In your Kubernetes
 application namespace, an application specific user has been created for you and hooked up to the application already.
