@@ -90,7 +90,12 @@ parameters:
     options:
       - "yes"
       - "no"
-
+  - field: CIVendor
+    label: Using either circleCI or github Actions to build / test your repository
+    default: "circleci"
+    options:
+      - "circleci"
+      - "github-actions"
 conditions:
   - action: ignoreFile
     matchField: fileUploads
@@ -106,3 +111,13 @@ conditions:
     - kubernetes/base/auth.yml
     - kubernetes/overlays/staging/auth.yml
     - kubernetes/overlays/production/auth.yml
+  - action: ignoreFile
+    matchField: CIVendor
+    whenValue: "circleci"
+    data:
+    - .github/
+  - action: ignoreFile
+    matchField: CIVendor
+    whenValue: "github-actions"
+    data:
+    - .circleci/
