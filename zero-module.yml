@@ -90,6 +90,12 @@ parameters:
     options:
       - "yes"
       - "no"
+  - field: graphql
+    label: Enable graphql and apollo server?
+    default: yes
+    options:
+      - "yes"
+      - "no"
 
 conditions:
   - action: ignoreFile
@@ -106,3 +112,8 @@ conditions:
     - kubernetes/base/auth.yml
     - kubernetes/overlays/staging/auth.yml
     - kubernetes/overlays/production/auth.yml
+  - action: ignoreFile
+    matchField: graphql
+    whenValue: "no"
+    data:
+    - src/app/graphql

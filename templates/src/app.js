@@ -1,13 +1,15 @@
 const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
+const dbDatasource = require("./db");
 <%if eq (index .Params `graphql`) "yes" %>const { ApolloServer } = require("apollo-server-express");
 
 const typeDefs = require("./app/graphql/schema");
+const { createStore } = require("./app/graphql/utils");
 const resolvers = require("./app/graphql/resolvers");
-const ExampleAPIDataSource = require("./app/graphql/exampleapiDataSource");
-const dbInitializer = require("./app/graphql/dbInitializer");
-const exampleRoutes = require("./app/graphql/exampleapi");<% end %>
+const LaunchAPI = require('./app/graphql/datasources/launch');
+const UserAPI = require('./app/graphql/datasources/user');
+const isEmail = require('isemail');<% end %>
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
 const statusRoutes = require("./app/status");
 <%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");<% end %>
@@ -18,17 +20,28 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-<%if eq (index .Params `graphql`) "yes" %>const server = new ApolloServer({
+<%if eq (index .Params `graphql`) "yes" %>
+const store = createStore();
+
+const server = new ApolloServer({
+  context: async ({ req }) => {
+    // simple auth check on every request
+    const auth = req.headers && req.headers.authorization || '';
+    const email = Buffer.from(auth, 'base64').toString('ascii');
+    if (!isEmail.validate(email)) return { user: null };
+    // find a user by their email
+    const users = await store.users.findOrCreate({ where: { email } });
+    const user = users && users[0] || null;
+    return { user: { ...user.dataValues } };
+  },
   typeDefs,
   resolvers,
   dataSources: () => ({
-    ExampleapiDataSource: new ExampleAPIDataSource(),
+    launchAPI: new LaunchAPI(),
+    userAPI: new UserAPI({ store })
   }),
 });
-server.applyMiddleware({ app });
-
-dbInitializer.initschema();
-app.use("/example", exampleRoutes);<% end %>
+server.applyMiddleware({ app });<% end %>
 
 <%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
 
@@ -44,7 +57,6 @@ if (!port) {
 const main = async () => {
   // remove this block for development, just for verifying DB
   try {
-    const dbDatasource = require("./db/datasource");
     await dbDatasource.authenticate();
     console.log("Connection has been established successfully.");
     const res = await dbDatasource.query("SELECT 1");
