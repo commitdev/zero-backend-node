@@ -1,6 +1,6 @@
 var { Router } = require("express");
 
-var router = Router()
+var router = Router();
 
 router.get("/ready", (req, res) => {
   res.send("OK");

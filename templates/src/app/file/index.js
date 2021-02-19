@@ -2,7 +2,7 @@ var { Router } = require("express");
 var aws = require("aws-sdk");
 var cfsign = require("aws-cloudfront-sign");
 
-var router = Router()
+var router = Router();
 var s3 = new aws.S3();
 
 router.get("/presigned/:key", (req, res) => {
