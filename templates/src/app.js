@@ -59,6 +59,8 @@ const main = async () => {
   try {
     await dbDatasource.authenticate();
     console.log("Connection has been established successfully.");
+    await dbDatasource.sync( {alter: true} );
+    console.log("Create or alter tables");
     const res = await dbDatasource.query("SELECT 1");
     console.log(`Query successful, returned ${res[0].length} rows.`);
   } catch (e) {

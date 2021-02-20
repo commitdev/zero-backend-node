@@ -1,4 +1,5 @@
 const SQL = require('sequelize');
+const db = require("../../db");
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -33,13 +34,6 @@ module.exports.createStore = () => {
   const operatorsAliases = {
     $in: Op.in,
   };
-
-  const db = new SQL('database', 'username', 'password', {
-    dialect: 'sqlite',
-    storage: './store.sqlite',
-    operatorsAliases,
-    logging: false,
-  });
 
   const users = db.define('user', {
     id: {
