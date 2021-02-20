@@ -31,6 +31,8 @@ This repository is language/business-logic agnostic; mainly showcasing some univ
 |       |   |-- deployment.yml
 |       |   |-- kustomization.yml
 |       |   |-- service.yml
+│       ├── migration/
+│       │   └── job.yml
 |       |-- overlays/
 |       |   |-- production/
 |       |   |   |-- deployment.yml
@@ -38,6 +40,11 @@ This repository is language/business-logic agnostic; mainly showcasing some univ
 |       |   |   |-- kustomization.yml
 |       |   |   |-- pdb.yml
 |       |   |-- staging/
+|       |   |   |-- deployment.yml
+|       |   |   |-- ingress.yml
+|       |   |   |-- kustomization.yml
+|       |   |   |-- pdb.yml
+|       |   |-- dev/
 |       |   |   |-- deployment.yml
 |       |   |   |-- ingress.yml
 |       |   |   |-- kustomization.yml

@@ -96,7 +96,12 @@ parameters:
     options:
       - "yes"
       - "no"
-
+  - field: CIVendor
+    label: Using either circleCI or github Actions to build / test your repository
+    default: "circleci"
+    options:
+      - "circleci"
+      - "github-actions"
 conditions:
   - action: ignoreFile
     matchField: fileUploads
@@ -117,3 +122,13 @@ conditions:
     whenValue: "no"
     data:
     - src/app/graphql
+  - action: ignoreFile
+    matchField: CIVendor
+    whenValue: "circleci"
+    data:
+    - .github/
+  - action: ignoreFile
+    matchField: CIVendor
+    whenValue: "github-actions"
+    data:
+    - .circleci/
