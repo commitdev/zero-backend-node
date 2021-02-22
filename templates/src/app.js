@@ -7,8 +7,8 @@ const dbDatasource = require("./db");
 const typeDefs = require("./app/graphql/schema");
 const { createStore } = require("./app/graphql/utils");
 const resolvers = require("./app/graphql/resolvers");
-const LaunchAPI = require("./app/graphql/datasources/launch");
-const UserAPI = require("./app/graphql/datasources/user");
+const LaunchAPI = require("./app/graphql/datasources/LaunchAPI");
+const UserDB = require("./app/graphql/datasources/UserDB");
 const FileAPI = require("./app/graphql/datasources/FileAPI")
 const isEmail = require('isemail');<% end %>
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
@@ -39,7 +39,7 @@ const server = new ApolloServer({
   resolvers,
   dataSources: () => ({
     launchAPI: new LaunchAPI(),
-    userAPI: new UserAPI({ store }),
+    userDB: new UserDB({ store }),
     fileAPI: new FileAPI()
   }),
 });
