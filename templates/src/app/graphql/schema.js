@@ -26,6 +26,12 @@ const typeDefs = gql`
         name: String
         missionPatch(size: PatchSize): String
       }
+
+      type PresignedUrl {
+        type: String
+        url: String
+        method: String 
+      }
       
       enum PatchSize {
         SMALL
@@ -45,6 +51,7 @@ const typeDefs = gql`
         ): LaunchConnection!
         launch(id: ID!): Launch
         me: User
+        presignedUrls(key: String!): [PresignedUrl]
       }
       
       

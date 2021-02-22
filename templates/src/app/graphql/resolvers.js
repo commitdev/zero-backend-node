@@ -24,7 +24,13 @@ module.exports = {
         },
         launch: (_, { id }, { dataSources }) =>
             dataSources.launchAPI.getLaunchById({ launchId: id }),
-        me: (_, __, { dataSources }) => dataSources.userAPI.findOrCreateUser()
+        me: (_, __, { dataSources }) => dataSources.userAPI.findOrCreateUser(),
+        presignedUrls: (_, { key }, { dataSources }) => {
+            const presignedurls = [];
+            presignedurls.push(dataSources.fileAPI.getDownloadPresignedUrl({ key }));
+            presignedurls.push(dataSources.fileAPI.getUploadPresignedUrl({ key }));
+            return presignedurls;
+        }
     },
 
     Mutation: {

@@ -9,7 +9,7 @@ router.get("/presigned", (req, res) => {
   var params = {
     Bucket: process.env.AWS_S3_DEFAULT_BUCKET,
     Key: req.query.key,
-    Expires: 60 * 5, // 5 minutes
+    Expires: 60 * 60, // 60 minutes
   };
   const url = s3.getSignedUrl('putObject',params);
   console.log(url);
@@ -23,7 +23,7 @@ router.get("/",(req, res) => {
   var params = {
     Bucket: process.env.AWS_S3_DEFAULT_BUCKET,
     Key: req.query.key,
-    Expires: 60 * 5, // 5 minutes
+    Expires: 60 * 60, // 60 minutes
   };
   const url = s3.getSignedUrl('getObject',params);
   console.log(url);
