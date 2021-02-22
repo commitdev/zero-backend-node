@@ -28,7 +28,7 @@ const typeDefs = gql`
       }
 
       type PresignedUrl {
-        type: String
+        category: String
         url: String
         method: String 
       }

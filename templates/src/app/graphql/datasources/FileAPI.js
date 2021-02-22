@@ -6,9 +6,9 @@ class FileAPI extends RESTDataSource {
         this.baseURL = 'http://localhost:8090';
     }
 
-    mapPresignedUrl(type,presignedUrl) {
+    mapPresignedUrl(category, presignedUrl) {
         return {
-            type: type,
+            category: category,
             url: presignedUrl.url,
             method: presignedUrl.method
         };
