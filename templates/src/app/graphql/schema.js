@@ -6,7 +6,6 @@ const typeDefs = gql`
         site: String
         mission: Mission
         rocket: Rocket
-        isBooked: Boolean!
     }
 
     type Rocket {
@@ -18,7 +17,6 @@ const typeDefs = gql`
       type User {
         id: ID!
         email: String!
-        trips: [Launch]!
         token: String
       }
       
@@ -40,14 +38,13 @@ const typeDefs = gql`
 
       type Query {
         launch(id: ID!): Launch
-        me: User
         presignedUrls(key: String!): [PresignedUrl]
       }
 
       type Mutation {
-        bookTrips(launchIds: [ID]!): TripUpdateResponse!
-        cancelTrip(launchId: ID!): TripUpdateResponse!
-        login(email: String): User
+        bookTrips(userId: Int, launchIds: [ID]!): TripUpdateResponse!
+        cancelTrip(userId: Int, launchId: ID!): TripUpdateResponse!
+        signup(email: String): User
       }
       
       type TripUpdateResponse {

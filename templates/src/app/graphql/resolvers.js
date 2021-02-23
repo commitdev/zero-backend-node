@@ -2,7 +2,6 @@ module.exports = {
     Query: {
         launch: (_, { id }, { dataSources }) =>
             dataSources.launchAPI.getLaunchById({ launchId: id }),
-        me: (_, __, { dataSources }) => dataSources.userDB.findOrCreateUser(),
         presignedUrls: (_, { key }, { dataSources }) => {
             const presignedurls = [];
             presignedurls.push(dataSources.fileAPI.getDownloadPresignedUrl({ key }));
@@ -12,15 +11,15 @@ module.exports = {
     },
 
     Mutation: {
-        login: async (_, { email }, { dataSources }) => {
+        signup: async (_, { email }, { dataSources }) => {
             const user = await dataSources.userDB.findOrCreateUser({ email });
             if (user) {
                 user.token = Buffer.from(email).toString('base64');
                 return user;
             }
         },
-        bookTrips: async (_, { launchIds }, { dataSources }) => {
-            const results = await dataSources.userDB.bookTrips({ launchIds });
+        bookTrips: async (_, { userId, launchIds }, { dataSources }) => {
+            const results = await dataSources.userDB.bookTrips({ userId, launchIds });
             const launches = await dataSources.launchAPI.getLaunchesByIds({
                 launchIds,
             });
@@ -36,8 +35,8 @@ module.exports = {
                 launches,
             };
         },
-        cancelTrip: async (_, { launchId }, { dataSources }) => {
-            const result = await dataSources.userDB.cancelTrip({ launchId });
+        cancelTrip: async (_, { userId, launchId }, { dataSources }) => {
+            const result = await dataSources.userDB.cancelTrip({ userId, launchId });
 
             if (!result)
                 return {
@@ -63,24 +62,4 @@ module.exports = {
                 : mission.missionPatchLarge;
         },
     },
-    Launch: {
-        isBooked: async (launch, _, { dataSources }) =>
-            dataSources.userAPI.isBookedOnLaunch({ launchId: launch.id }),
-    },
-    User: {
-        trips: async (_, __, { dataSources }) => {
-            // get ids of launches by user
-            const launchIds = await dataSources.userDB.getLaunchIdsByUser();
-            if (!launchIds.length) return [];
-            // look up those launches by their ids
-            return (
-                dataSources.launchAPI.getLaunchesByIds({
-                    launchIds,
-                }) || []
-            );
-        },
-    },
-
-
-
-};
+}; 

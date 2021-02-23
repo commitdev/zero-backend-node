@@ -3,7 +3,7 @@ const { RESTDataSource } = require('apollo-datasource-rest');
 class FileAPI extends RESTDataSource {
     constructor() {
         super();
-        this.baseURL = 'http://localhost:8090';
+        this.baseURL = 'http://localhost:3000';
     }
 
     mapPresignedUrl(type, presignedUrl) {
