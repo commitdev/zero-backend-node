@@ -2,10 +2,10 @@ const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
 const dbDatasource = require("./db");
-<%if eq (index .Params `graphql`) "yes" %>const { ApolloServer } = require("apollo-server-express");
+<%if eq (index .Params `apiType`) "graphql" %>const { ApolloServer } = require("apollo-server-express");
 
 const typeDefs = require("./app/graphql/schema");
-const { createStore } = require("./app/graphql/utils");
+const { createStore } = require("./app/graphql/initdb");
 const resolvers = require("./app/graphql/resolvers");
 const LaunchAPI = require("./app/graphql/datasources/LaunchAPI");
 const UserDB = require("./app/graphql/datasources/UserDB");
@@ -21,7 +21,7 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-<%if eq (index .Params `graphql`) "yes" %>
+<%if eq (index .Params `apiType`) "graphql" %>
 const store = createStore();
 
 const server = new ApolloServer({

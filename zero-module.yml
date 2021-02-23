@@ -90,12 +90,12 @@ parameters:
     options:
       - "yes"
       - "no"
-  - field: graphql
-    label: Enable graphql and apollo server?
-    default: yes
+  - field: apiType
+    label: What type of API do you want to expose?
+    default: rest
     options:
-      - "yes"
-      - "no"
+      - "rest"
+      - "graphql"
   - field: CIVendor
     label: Using either circleCI or github Actions to build / test your repository
     default: "circleci"
@@ -118,8 +118,8 @@ conditions:
     - kubernetes/overlays/staging/auth.yml
     - kubernetes/overlays/production/auth.yml
   - action: ignoreFile
-    matchField: graphql
-    whenValue: "no"
+    matchField: apiType
+    whenValue: "rest"
     data:
     - src/app/graphql
   - action: ignoreFile
