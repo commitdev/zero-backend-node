@@ -7,6 +7,9 @@ module.exports = {
             presignedurls.push(dataSources.fileAPI.getDownloadPresignedUrl({ key }));
             presignedurls.push(dataSources.fileAPI.getUploadPresignedUrl({ key }));
             return presignedurls;
+        },
+        userInfo: (_, {}, { dataSources }) => {
+            return dataSources.authAPI.getUserInfo();
         }
     },
 

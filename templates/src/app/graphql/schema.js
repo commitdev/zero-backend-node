@@ -12,46 +12,47 @@ const typeDefs = gql`
         id: ID!
         name: String
         type: String
-      }
+    }
       
-      type User {
-        id: ID!
-        email: String!
-        token: String
-      }
-      
-      type Mission {
-        name: String
-        missionPatch(size: PatchSize): String
-      }
+    type User {
+      id: ID!
+      email: String!
+      token: String
+    }
+    
+    type Mission {
+      name: String
+      missionPatch(size: PatchSize): String
+    }
 
-      type PresignedUrl {
-        type: String
-        url: String
-        method: String 
-      }
-      
-      enum PatchSize {
-        SMALL
-        LARGE
-      }
+    type PresignedUrl {
+      type: String
+      url: String
+      method: String 
+    }
+    
+    enum PatchSize {
+      SMALL
+      LARGE
+    }
 
-      type Query {
-        launch(id: ID!): Launch
-        presignedUrls(key: String!): [PresignedUrl]
-      }
+    type Query {
+      launch(id: ID!): Launch
+      presignedUrls(key: String!): [PresignedUrl]
+      userInfo: User
+    }
 
-      type Mutation {
-        bookTrips(userId: Int, launchIds: [ID]!): TripUpdateResponse!
-        cancelTrip(userId: Int, launchId: ID!): TripUpdateResponse!
-        signup(email: String): User
-      }
-      
-      type TripUpdateResponse {
-        success: Boolean!
-        message: String
-        launches: [Launch]
-      }
+    type Mutation {
+      bookTrips(userId: Int, launchIds: [ID]!): TripUpdateResponse!
+      cancelTrip(userId: Int, launchId: ID!): TripUpdateResponse!
+      signup(email: String): User
+    }
+    
+    type TripUpdateResponse {
+      success: Boolean!
+      message: String
+      launches: [Launch]
+    }
 `;
 
 module.exports = typeDefs;

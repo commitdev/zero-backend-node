@@ -9,8 +9,8 @@ const { createStore } = require("./app/graphql/initdb");
 const resolvers = require("./app/graphql/resolvers");
 const LaunchAPI = require("./app/graphql/datasources/LaunchAPI");
 const UserDB = require("./app/graphql/datasources/UserDB");
-const FileAPI = require("./app/graphql/datasources/FileAPI")
-const isEmail = require('isemail');<% end %>
+const FileAPI = require("./app/graphql/datasources/FileAPI");
+const AuthAPI = require("./app/graphql/datasources/AuthAPI");<% end %>
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
 const statusRoutes = require("./app/status");
 <%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");<% end %>
@@ -30,7 +30,8 @@ const server = new ApolloServer({
   dataSources: () => ({
     launchAPI: new LaunchAPI(),
     userDB: new UserDB({ store }),
-    fileAPI: new FileAPI()
+    fileAPI: new FileAPI(),
+    authAPI: new AuthAPI()
   }),
 });
 server.applyMiddleware({ app });<% end %>
