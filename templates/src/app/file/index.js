@@ -5,9 +5,8 @@ var router = Router();
 var s3 = new aws.S3();
 
 router.get("/presigned", (req, res) => {
-  var bucketName = (req.query.bucket)?(req.query.bucket):process.env.AWS_S3_DEFAULT_BUCKET;
   var params = {
-    Bucket: bucketName,
+    Bucket: process.env.S3_BUCKET,
     Key: req.query.key,
     Expires: 60 * 60, // 60 minutes
   };
@@ -20,9 +19,8 @@ router.get("/presigned", (req, res) => {
 });
 
 router.get("/",(req, res) => {
-  var bucketName = (req.query.bucket)?(req.query.bucket):process.env.AWS_S3_DEFAULT_BUCKET;
   var params = {
-    Bucket: bucketName,
+    Bucket: process.env.S3_BUCKET,
     Key: req.query.key,
     Expires: 60 * 60, // 60 minutes
   };
