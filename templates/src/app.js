@@ -25,6 +25,10 @@ app.use(express.urlencoded({ extended: false }));
 const store = createStore();
 
 const server = new ApolloServer({
+  context: async ( {req} ) => {
+    if(req.headers["x-user-id"] && req.headers["x-user-email"])
+    return { auth: {id: req.headers["x-user-id"], email: req.headers["x-user-email"]} };
+  },
   typeDefs,
   resolvers,
   dataSources: () => ({
@@ -66,3 +70,4 @@ const main = async () => {
 };
 
 main();
+
