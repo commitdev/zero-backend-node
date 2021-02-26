@@ -1,35 +1,17 @@
-var { Router } = require("express");
-var aws = require("aws-sdk");
+const { Router } = require("express");
+const FileService = require("../../service/file");
 
-var router = Router();
-var s3 = new aws.S3();
+const router = Router();
+const fileService = new FileService();
 
 router.get("/presigned", (req, res) => {
-  var params = {
-    Bucket: process.env.S3_BUCKET,
-    Key: req.query.key,
-    Expires: 60 * 60, // 60 minutes
-  };
-  const url = s3.getSignedUrl('putObject',params);
-  console.log(url);
-  res.send({
-    "url":url,
-    "method":"put"
-  });
+  var key = req.query.key;
+  return res.json(fileService.getUploadPresignedUrl( key ));
 });
 
 router.get("/",(req, res) => {
-  var params = {
-    Bucket: process.env.S3_BUCKET,
-    Key: req.query.key,
-    Expires: 60 * 60, // 60 minutes
-  };
-  const url = s3.getSignedUrl('getObject',params);
-  console.log(url);
-  res.send({
-    "url":url,
-    "method":"get"
-  });
+  var key = req.query.key;
+  return res.json(fileService.getDownloadPresignedUrl( key ));
 });
 
 module.exports = router;

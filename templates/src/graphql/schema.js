@@ -26,9 +26,13 @@ const typeDefs = gql`
     }
 
     type PresignedUrl {
-      type: String
       url: String
       method: String 
+    }
+
+    type PresignedUrls {
+      upload: PresignedUrl
+      download: PresignedUrl
     }
 
     type Status {
@@ -44,7 +48,7 @@ const typeDefs = gql`
 
     type Query {
       launch(id: ID!): Launch
-      presignedUrls(key: String!): [PresignedUrl]
+      presignedUrls(key: String!): PresignedUrls
       userInfo: User,
       status: Status
     }

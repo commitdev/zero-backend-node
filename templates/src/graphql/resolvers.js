@@ -1,11 +1,16 @@
+const FileService = require("../service/file");
+
+const fileService = new FileService();
+
 module.exports = {
     Query: {
         launch: (_, { id }, { dataSources }) =>
             dataSources.launchAPI.getLaunchById({ launchId: id }),
         presignedUrls: (_, { key }, { dataSources }) => {
-            const presignedurls = [];
-            presignedurls.push(dataSources.fileAPI.getDownloadPresignedUrl({ key }));
-            presignedurls.push(dataSources.fileAPI.getUploadPresignedUrl({ key }));
+            const presignedurls = {
+                upload: fileService.getUploadPresignedUrl( key ),
+                download: fileService.getDownloadPresignedUrl( key )
+            };
             return presignedurls;
         },
         userInfo: (_, {}, { dataSources }) => {
