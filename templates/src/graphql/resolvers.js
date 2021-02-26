@@ -10,7 +10,16 @@ module.exports = {
         },
         userInfo: (_, {}, { dataSources }) => {
             return dataSources.authAPI.getUserInfo();
+        },
+        status: (_, {}, {}) => {
+            var podName = (process.env.POD_NAME)?process.env.POD_NAME:"zero-node-backend";
+            return {
+                ready: "OK",
+                alive: "OK",
+                podName: podName
+            };
         }
+
     },
 
     Mutation: {

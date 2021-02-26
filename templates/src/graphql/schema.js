@@ -30,6 +30,12 @@ const typeDefs = gql`
       url: String
       method: String 
     }
+
+    type Status {
+      ready: String
+      alive: String
+      podName: String
+    }
     
     enum PatchSize {
       SMALL
@@ -39,7 +45,8 @@ const typeDefs = gql`
     type Query {
       launch(id: ID!): Launch
       presignedUrls(key: String!): [PresignedUrl]
-      userInfo: User
+      userInfo: User,
+      status: Status
     }
 
     type Mutation {
