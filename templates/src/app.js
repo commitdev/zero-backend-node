@@ -8,8 +8,6 @@ const typeDefs = require("./graphql/schema");
 const { createStore } = require("./graphql/initdb");
 const resolvers = require("./graphql/resolvers");
 const LaunchAPI = require("./graphql/datasources/LaunchAPI");
-const UserDB = require("./graphql/datasources/UserDB");
-const FileAPI = require("./graphql/datasources/FileAPI");
 const AuthAPI = require("./graphql/datasources/AuthAPI");<% end %>
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
 const statusRoutes = require("./app/status");
@@ -22,21 +20,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 <%if eq (index .Params `apiType`) "graphql" %>
-const store = createStore();
-
 const server = new ApolloServer({
   context: async ( {req} ) => {
     if(req.headers["x-user-id"] && req.headers["x-user-email"])
     return { auth: {id: req.headers["x-user-id"], email: req.headers["x-user-email"]} };
   },
   typeDefs,
-  resolvers,
-  dataSources: () => ({
-    launchAPI: new LaunchAPI(),
-    userDB: new UserDB({ store }),
-    fileAPI: new FileAPI(),
-    authAPI: new AuthAPI()
-  }),
+  resolvers
 });
 server.applyMiddleware({ app });<% end %>
 

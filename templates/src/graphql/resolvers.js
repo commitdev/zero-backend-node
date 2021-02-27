@@ -1,11 +1,11 @@
 const FileService = require("../service/file");
+const TripService = require("../service/trip");
 
 const fileService = new FileService();
+const tripService = new TripService();
 
 module.exports = {
     Query: {
-        launch: (_, { id }, { dataSources }) =>
-            dataSources.launchAPI.getLaunchById({ launchId: id }),
         presignedUrls: (_, { key }, { dataSources }) => {
             const presignedurls = {
                 upload: fileService.getUploadPresignedUrl( key ),
@@ -23,24 +23,22 @@ module.exports = {
                 alive: "OK",
                 podName: podName
             };
+        },
+        bookedTrips: (_, { userId }, {}) => {
+            return tripService.getBookedTrips( {userId} );
         }
-
     },
 
     Mutation: {
         signup: async (_, { email }, { dataSources }) => {
-            const user = await dataSources.userDB.findOrCreateUser({ email });
+            const user = await tripService.signup({ email });
             if (user) {
                 user.token = Buffer.from(email).toString('base64');
                 return user;
             }
         },
         bookTrips: async (_, { userId, launchIds }, { dataSources }) => {
-            const results = await dataSources.userDB.bookTrips({ userId, launchIds });
-            const launches = await dataSources.launchAPI.getLaunchesByIds({
-                launchIds,
-            });
-
+            const results = await tripService.bookTrips({ userId, launchIds });
             return {
                 success: results && results.length === launchIds.length,
                 message:
@@ -48,35 +46,21 @@ module.exports = {
                         ? 'trips booked successfully'
                         : `the following launches couldn't be booked: ${launchIds.filter(
                             id => !results.includes(id),
-                        )}`,
-                launches,
+                        )}`
             };
         },
         cancelTrip: async (_, { userId, launchId }, { dataSources }) => {
-            const result = await dataSources.userDB.cancelTrip({ userId, launchId });
-
+            const result = await tripService.cancelTrip({ userId, launchId });
             if (!result)
                 return {
                     success: false,
                     message: 'failed to cancel trip',
                 };
-
-            const launch = await dataSources.launchAPI.getLaunchById({ launchId });
             return {
                 success: true,
                 message: 'trip cancelled',
-                launches: [launch],
             };
         },
 
-    },
-
-    Mission: {
-        // The default size is 'LARGE' if not provided
-        missionPatch: (mission, { size } = { size: 'LARGE' }) => {
-            return size === 'SMALL'
-                ? mission.missionPatchSmall
-                : mission.missionPatchLarge;
-        },
     },
 }; 

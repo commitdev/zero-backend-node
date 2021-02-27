@@ -1,30 +1,13 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
-    type Launch {
-        id: ID!
-        site: String
-        mission: Mission
-        rocket: Rocket
-    }
 
-    type Rocket {
-        id: ID!
-        name: String
-        type: String
-    }
-      
     type User {
       id: ID!
       email: String!
       token: String
     }
-    
-    type Mission {
-      name: String
-      missionPatch(size: PatchSize): String
-    }
-
+  
     type PresignedUrl {
       url: String
       method: String 
@@ -40,17 +23,18 @@ const typeDefs = gql`
       alive: String
       podName: String
     }
-    
-    enum PatchSize {
-      SMALL
-      LARGE
+
+    type Trip {
+      id: ID!
+      launchId: Int
+      userId: Int
     }
 
     type Query {
-      launch(id: ID!): Launch
       presignedUrls(key: String!): PresignedUrls
       userInfo: User,
-      status: Status
+      status: Status,
+      bookedTrips(userId: Int): [Trip]
     }
 
     type Mutation {
@@ -62,7 +46,6 @@ const typeDefs = gql`
     type TripUpdateResponse {
       success: Boolean!
       message: String
-      launches: [Launch]
     }
 `;
 
