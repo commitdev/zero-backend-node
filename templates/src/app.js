@@ -5,10 +5,7 @@ const dbDatasource = require("./db");
 <%if eq (index .Params `apiType`) "graphql" %>const { ApolloServer } = require("apollo-server-express");
 
 const typeDefs = require("./graphql/schema");
-const { createStore } = require("./graphql/initdb");
-const resolvers = require("./graphql/resolvers");
-const LaunchAPI = require("./graphql/datasources/LaunchAPI");
-const AuthAPI = require("./graphql/datasources/AuthAPI");<% end %>
+const resolvers = require("./graphql/resolvers");<% end %>
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
 const statusRoutes = require("./app/status");
 <%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");<% end %>
@@ -47,7 +44,7 @@ const main = async () => {
     await dbDatasource.authenticate();
     console.log("Connection has been established successfully.");
     await dbDatasource.sync( {alter: true} );
-    console.log("Create or alter tables");
+    console.log("Created or altered tables");
     const res = await dbDatasource.query("SELECT 1");
     console.log(`Query successful, returned ${res[0].length} rows.`);
   } catch (e) {
