@@ -4,7 +4,8 @@ const {jwtSecret} = require("./conf")
 
 const router = Router();
 
-/* This endpoint help you generate access token without the third party of Identity Provider*/
+/* This endpoint help you generate access token for testing 
+without the third party of Identity Provider*/
 router.post("/token", (req, res, next) => {
   try{
     const user = req.body;

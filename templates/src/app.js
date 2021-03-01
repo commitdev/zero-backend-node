@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const express = require("express");
-const expressJWT = require("express-jwt");
+
 const morgan = require("morgan");
 const dbDatasource = require("./db");
 <%if eq (index .Params `apiType`) "graphql" %>const { ApolloServer } = require("apollo-server-express");
@@ -10,9 +10,9 @@ const resolvers = require("./graphql/resolvers");<% end %>
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
 const statusRoutes = require("./app/status");
 <%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");<% end %>
-const { jwtSecret } = require("./conf");
 const mockauthRoutes = require("./mockauth");
-const pathToRegexp = require('path-to-regexp');
+const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");
+
 
 dotenv.config();
 const app = express();
@@ -20,18 +20,8 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//the middleware to verify token and parse token to req.user
-app.use(expressJWT({
-  secret: jwtSecret,
-  algorithms: ['HS256','RS256']
-  }).unless({
-  path: [pathToRegexp('/mock/*'), pathToRegexp('/status/*')] 
-}));
-app.use(function (err, req, res, next) {
-  if (err.name === 'UnauthorizedError') {   
-    res.status(401).json('invalid token')
-  }
-});
+app.use(jwtDecoder);
+app.use(unAuthErrorHandler);
 
 <%if eq (index .Params `apiType`) "graphql" %>
 const server = new ApolloServer({
