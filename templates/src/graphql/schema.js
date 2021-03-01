@@ -5,7 +5,6 @@ const typeDefs = gql`
     type User {
       id: ID!
       email: String!
-      token: String
     }
   
     type PresignedUrl {
@@ -34,12 +33,12 @@ const typeDefs = gql`
       presignedUrls(key: String!): PresignedUrls
       userInfo: User,
       status: Status,
-      bookedTrips(userId: Int): [Trip]
+      bookedTrips: [Trip]
     }
 
     type Mutation {
-      bookTrips(userId: Int, launchIds: [ID]!): TripUpdateResponse!
-      cancelTrip(userId: Int, launchId: ID!): TripUpdateResponse!
+      bookTrips(launchIds: [ID]!): TripUpdateResponse!
+      cancelTrip(launchId: ID!): TripUpdateResponse!
       signup(email: String): User
     }
     

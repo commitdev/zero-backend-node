@@ -6,15 +6,15 @@ const tripService = new TripService();
 
 module.exports = {
     Query: {
-        presignedUrls: (_, { key }, { dataSources }) => {
+        presignedUrls: (_, { key }, context) => {
             const presignedurls = {
                 upload: fileService.getUploadPresignedUrl( key ),
                 download: fileService.getDownloadPresignedUrl( key )
             };
             return presignedurls;
         },
-        userInfo: (_, {}, { dataSources }) => {
-            return dataSources.authAPI.getUserInfo();
+        userInfo: (_, {}, context) => {
+            return context.user;
         },
         status: (_, {}, {}) => {
             var podName = (process.env.POD_NAME)?process.env.POD_NAME:"zero-node-backend";
@@ -24,21 +24,20 @@ module.exports = {
                 podName: podName
             };
         },
-        bookedTrips: (_, { userId }, {}) => {
-            return tripService.getBookedTrips( {userId} );
+        bookedTrips: (_, { }, context) => {
+            return tripService.getBookedTrips( {userId: context.user.id} );
         }
     },
 
     Mutation: {
-        signup: async (_, { email }, { dataSources }) => {
+        signup: async (_, { email }, context) => {
             const user = await tripService.signup({ email });
             if (user) {
-                user.token = Buffer.from(email).toString('base64');
                 return user;
             }
         },
-        bookTrips: async (_, { userId, launchIds }, { dataSources }) => {
-            const results = await tripService.bookTrips({ userId, launchIds });
+        bookTrips: async (_, { launchIds }, context) => {
+            const results = await tripService.bookTrips({ userId: context.user.id , launchIds });
             return {
                 success: results && results.length === launchIds.length,
                 message:
@@ -49,8 +48,8 @@ module.exports = {
                         )}`
             };
         },
-        cancelTrip: async (_, { userId, launchId }, { dataSources }) => {
-            const result = await tripService.cancelTrip({ userId, launchId });
+        cancelTrip: async (_, { launchId }, context) => {
+            const result = await tripService.cancelTrip({ userId: context.user.id, launchId });
             if (!result)
                 return {
                     success: false,

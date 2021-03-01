@@ -30,7 +30,9 @@
     "morgan": "^1.10.0",
     <%if eq (index .Params `database`) "postgres" %>"pg": "^8.4.1",
     "pg-hstore": "^2.3.3",<% else if eq (index .Params `database`) "mysql" %>"mysql2": "^2.2.5",<% end %>
-    "sequelize": "^6.3.5"
+    "sequelize": "^6.3.5",
+    <%if eq (index .Params `userAuth`) "yes" %>"express-jwt": "^6.0.0",
+    "jsonwebtoken": "^8.5.1" <% end %>
   },
   "devDependencies": {
     "eslint": "^7.10.0",

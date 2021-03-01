@@ -4,7 +4,7 @@ var { authMiddleware } = require("../../middleware/auth");
 
 var router = Router();
 
-router.get("/userInfo", authMiddleware, (req, res) => {
+router.get("/userInfo", (req, res) => {
   res.json(req.user);
 });
 
