@@ -114,6 +114,7 @@ conditions:
     data:
     - src/middleware/auth
     - src/app/auth
+    - src/mockauth.js
     - kubernetes/base/auth.yml
     - kubernetes/overlays/staging/auth.yml
     - kubernetes/overlays/production/auth.yml
@@ -121,7 +122,14 @@ conditions:
     matchField: apiType
     whenValue: "rest"
     data:
-    - src/app/graphql
+    - src/graphql
+    - src/graphql.js
+  - action: ignoreFile
+    matchField: apiType
+    whenValue: "graphql"
+    data:
+    - src/app
+    - src/app.js    
   - action: ignoreFile
     matchField: CIVendor
     whenValue: "circleci"

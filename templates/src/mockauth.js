@@ -12,7 +12,9 @@ router.post("/token", (req, res, next) => {
     if(!user || !user.id || !user.email){
       res.status(400).send("id and email are required");
     } else {
-      const access_token = jwt.sign(user, jwtSecret, {expiresIn: "20m"});
+      //in a real scenario, user needs to be verified by querying database.
+      // ..query code..
+      const access_token = jwt.sign(user, jwtSecret, {expiresIn: "5m"});
       res.json({
         access_token
       })

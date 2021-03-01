@@ -3,11 +3,14 @@ const express = require("express");
 
 const morgan = require("morgan");
 const dbDatasource = require("./db");
-<%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
-const statusRoutes = require("./app/status");
-<%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");
+const { ApolloServer } = require("apollo-server-express");
+
+const typeDefs = require("./graphql/schema");
+const resolvers = require("./graphql/resolvers");
+<%if eq (index .Params `userAuth`) "yes" %>
 const mockauthRoutes = require("./mockauth");
 const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");<% end %>
+
 
 dotenv.config();
 const app = express();
@@ -15,15 +18,22 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-<%if eq (index .Params `userAuth`) "yes" %>app.use(jwtDecoder);
-app.use(unAuthErrorHandler);<% end %>
+app.use(jwtDecoder);
+app.use(unAuthErrorHandler);
 
-<%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
+const server = new ApolloServer({
+  context: async ( {req} ) => {
+    if(req.user){
+      return { user: {id: req.user.id, email: req.user.email} };
+    }
+  },
+  typeDefs,
+  resolvers
+});
+server.applyMiddleware({ app });
 
-<%if eq (index .Params `userAuth`) "yes" %>app.use("/auth", authRoutes);<% end %>
-app.use("/mock",mockauthRoutes);
-
-app.use("/status", statusRoutes);
+<%if eq (index .Params `userAuth`) "yes" %>
+app.use("/mock",mockauthRoutes);<% end %>
 
 var port = process.env.SERVER_PORT;
 if (!port) {
