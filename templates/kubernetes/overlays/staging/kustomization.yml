@@ -18,4 +18,3 @@ configMapGenerator:
     - ENVIRONMENT=staging
     - DOMAIN=<% index .Params `stagingHostRoot` %>
     - S3_BUCKET=files.<% index .Params `stagingHostRoot` %>
-    <%if eq (index .Params `apiType`) "graphql" %>- GRAPHQL_BASE_URL=https://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %><% end %>

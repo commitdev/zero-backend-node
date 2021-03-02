@@ -19,4 +19,3 @@ configMapGenerator:
     - ENVIRONMENT=production
     - DOMAIN=<% index .Params `productionHostRoot` %>
     - S3_BUCKET=files.<% index .Params `productionHostRoot` %>
-    <%if eq (index .Params `apiType`) "graphql" %>- GRAPHQL_BASE_URL=https://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %><% end %>
