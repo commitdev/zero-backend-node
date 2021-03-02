@@ -5,12 +5,12 @@ const router = Router();
 const fileService = new FileService();
 
 router.get("/presigned", (req, res) => {
-  var key = req.query.key;
+  let key = req.query.key;
   return res.json(fileService.getUploadPresignedUrl( key ));
 });
 
 router.get("/",(req, res) => {
-  var key = req.query.key;
+  let key = req.query.key;
   return res.json(fileService.getDownloadPresignedUrl( key ));
 });
 

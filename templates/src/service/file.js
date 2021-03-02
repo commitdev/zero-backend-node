@@ -6,7 +6,7 @@ class FileService {
     constructor(){}
 
     getUploadPresignedUrl(key){
-        var params = {
+        const params = {
             Bucket: process.env.S3_BUCKET,
             Key: key,
             Expires: 60 * 60, // 60 minutes
@@ -19,7 +19,7 @@ class FileService {
     }
 
     getDownloadPresignedUrl(key){
-        var params = {
+        const params = {
             Bucket: process.env.S3_BUCKET,
             Key: key,
             Expires: 60 * 60, // 60 minutes

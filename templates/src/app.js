@@ -25,7 +25,7 @@ app.use("/mock",mockauthRoutes);
 
 app.use("/status", statusRoutes);
 
-var port = process.env.SERVER_PORT;
+const port = process.env.SERVER_PORT;
 if (!port) {
   port = 3000;
 }

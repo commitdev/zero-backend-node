@@ -1,6 +1,6 @@
-var { Router } = require("express");
+const { Router } = require("express");
 
-var router = Router();
+const router = Router();
 
 router.get("/ready", (req, res) => {
   res.json({ ready: "OK" });

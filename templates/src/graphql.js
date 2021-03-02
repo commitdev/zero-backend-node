@@ -35,7 +35,7 @@ server.applyMiddleware({ app });
 <%if eq (index .Params `userAuth`) "yes" %>
 app.use("/mock",mockauthRoutes);<% end %>
 
-var port = process.env.SERVER_PORT;
+const port = process.env.SERVER_PORT;
 if (!port) {
   port = 3000;
 }

@@ -1,8 +1,6 @@
-var { Router } = require("express");
+const { Router } = require("express");
 
-var { authMiddleware } = require("../../middleware/auth");
-
-var router = Router();
+const router = Router();
 
 router.get("/userInfo", (req, res) => {
   res.json(req.user);
