@@ -9,8 +9,7 @@ const combine = require("graphql-combine");
 const path = require("path");
 <%if eq (index .Params `userAuth`) "yes" %>
 const mockauthRoutes = require("./mockauth");
-const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");const { pathToFileURL } = require("url");
-<% end %>
+const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");<% end %>
 
 
 dotenv.config();

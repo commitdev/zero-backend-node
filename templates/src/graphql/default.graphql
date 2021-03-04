@@ -1,8 +1,10 @@
-"User object for the authentication"
+"""
+This schema is the default graphql schema, please don't remove it.
+"""
+
+"The user object for the authentication"
 type User {
-  """
-  The user id that Identity Provider assigned.
-  """
+  "The user id from the authentication middleware"
   id: ID!
   email: String!
 }
@@ -13,31 +15,31 @@ type PresignedUrl {
   that has been stored or will be stored on a cloud storage
   """
   url: String
-  """
-  The http request method such as GET, PUT, POST
-  """
+  "The http request method such as GET, PUT, POST"
   method: String 
 }
-"A presigned urls collection that is able to return all presigned urls to a user at the same time. "
+
+"""
+A presigned urls collection that contains all presigned urls 
+for a specific file on a cloud storage 
+"""
 type PresignedUrls {
-  """
-  The presigned url object for file uploading
-  """
+  "The presigned url object for file uploading"
   upload: PresignedUrl
-  """
-  The presigned url object for file downloading
-  """
+  "The presigned url object for file downloading"
   download: PresignedUrl
 }
 
-"Type Query defines all query / read methods that clients can call. These methods must be implemented in resolver as well."
+"""
+Type Query defines all query / read methods that clients can call. 
+These methods must be implemented in resolver as well.
+"""
 type Query {
   """
-  Get all presigned urls for a specific file that has been stored or will be stored on a cloud storage
+  Get all presigned urls for a specific file 
+  that has been stored or will be stored on a cloud storage
   """
   presignedUrls(key: String!): PresignedUrls
-  """
-  Get user object from the decoded JWT
-  """
+  "Get user object from the authentication middleware"
   userInfo: User,
 }

@@ -1,15 +1,7 @@
-const isEmail = require('isemail');
-const User = require("../db/model/User");
 const Trip = require("../db/model/Trip");
 
 class TripService {
   constructor() {
-  }
-
-  async signup({ email }) {
-    if (!email || !isEmail.validate(email)) return null;
-    const users = await User.findOrCreate({ where: { email } });
-    return users && users[0] ? users[0] : null;
   }
 
   async bookTrips({ userId, launchIds }) {
