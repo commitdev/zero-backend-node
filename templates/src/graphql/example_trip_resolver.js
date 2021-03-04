@@ -1,33 +1,14 @@
-const FileService = require("../service/file");
 const TripService = require("../service/trip");
-
-const fileService = new FileService();
 const tripService = new TripService();
 
 module.exports = {
     Query: {
-        presignedUrls: (_, { key }, context) => {
-            const presignedurls = {
-                upload: fileService.getUploadPresignedUrl( key ),
-                download: fileService.getDownloadPresignedUrl( key )
-            };
-            return presignedurls;
-        },
-        userInfo: (_, {}, context) => {
-            return context.user;
-        },
         bookedTrips: (_, { }, context) => {
             return tripService.getBookedTrips( {userId: context.user.id} );
         }
     },
 
     Mutation: {
-        signup: async (_, { email }, context) => {
-            const user = await tripService.signup({ email });
-            if (user) {
-                return user;
-            }
-        },
         bookTrips: async (_, { launchIds }, context) => {
             const results = await tripService.bookTrips({ userId: context.user.id , launchIds });
             return {

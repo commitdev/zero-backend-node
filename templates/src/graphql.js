@@ -5,11 +5,12 @@ const morgan = require("morgan");
 const dbDatasource = require("./db");
 const { ApolloServer } = require("apollo-server-express");
 
-const typeDefs = require("./graphql/schema");
-const resolvers = require("./graphql/resolvers");
+const combine = require("graphql-combine");
+const path = require("path");
 <%if eq (index .Params `userAuth`) "yes" %>
 const mockauthRoutes = require("./mockauth");
-const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");<% end %>
+const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");const { pathToFileURL } = require("url");
+<% end %>
 
 
 dotenv.config();
@@ -20,6 +21,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(jwtDecoder);
 app.use(unAuthErrorHandler);
+
+const {typeDefs, resolvers} = combine({
+  typeDefs: path.join(__dirname, "graphql/*.graphql"),
+  resolvers: path.join(__dirname, "graphql/*_resolver.js")
+});
 
 const server = new ApolloServer({
   context: async ( {req} ) => {

@@ -1,0 +1,38 @@
+    "Example type for Mutation."
+    type Trip {
+      """
+      The serials number for a trip 
+      """
+      id: ID!
+      """
+      The flight_number listed in https://api.spacexdata.com/v2/launches
+      """
+      launchId: Int
+      """
+      The user id that Identity Provider assigned. 
+      """
+      userId: Int
+    }
+    
+    type Query {
+      """
+      List all booked trips. This is an query example, you can remove it. 
+      """
+      bookedTrips: [Trip]
+    }
+
+    type Mutation {
+      """
+      Book trips. This is an mutation example, you can remove it.
+      """
+      bookTrips(launchIds: [ID]!): TripUpdateResponse!
+      """
+      Cancel a trip. This is an mutation example, you can remove it.
+      """      
+      cancelTrip(launchId: ID!): TripUpdateResponse!
+    }
+    "The response body when bookTrips or cancelTrip method is called"
+    type TripUpdateResponse {
+      success: Boolean!
+      message: String
+    }

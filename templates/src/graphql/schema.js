@@ -32,21 +32,7 @@ const typeDefs = gql`
       """
       download: PresignedUrl
     }
-    "Back-end service status object"
-    type Status {
-      """
-      status of back-end service is ready or not
-      """
-      ready: String
-      """
-      status of back-end service is alive or not
-      """
-      alive: String
-      """
-      product name
-      """
-      podName: String
-    }
+
     "Example type for Mutation."
     type Trip {
       """
@@ -73,10 +59,6 @@ const typeDefs = gql`
       Get user object from the decoded JWT
       """
       userInfo: User,
-      """
-      Get back-end service status
-      """
-      status: Status,
       """
       List all booked trips. This is an query example, you can remove it. 
       """
