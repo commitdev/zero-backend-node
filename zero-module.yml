@@ -124,6 +124,8 @@ conditions:
     data:
     - src/graphql
     - src/graphql.js
+    - src/db/model/Trip.js
+    - src/service/trip.js
   - action: ignoreFile
     matchField: apiType
     whenValue: "graphql"
