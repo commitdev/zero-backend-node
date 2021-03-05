@@ -18,8 +18,6 @@ app.use("/auth", authRoutes);<% end %>
 
 <%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
 
-<%if eq (index .Params `userAuth`) "yes" %><% end %>
-
 app.use("/status", statusRoutes);
 
 const port = process.env.SERVER_PORT;
