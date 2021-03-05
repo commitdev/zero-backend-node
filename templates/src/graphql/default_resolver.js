@@ -3,10 +3,10 @@ const fileService = new FileService();
 
 module.exports = {
     Query: {
-        presignedUrls: (_, { key }, context) => {
+        signedUrls: (_, { key }, context) => {
             const presignedurls = {
-                upload: fileService.getUploadPresignedUrl( key ),
-                download: fileService.getDownloadPresignedUrl( key )
+                upload: fileService.getUploadSignedUrl( key ),
+                download: fileService.getDownloadSignedUrl( key )
             };
             return presignedurls;
         },

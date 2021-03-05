@@ -1,13 +1,11 @@
 const dotenv = require("dotenv");
 const express = require("express");
-
 const morgan = require("morgan");
 const dbDatasource = require("./db");
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
-const statusRoutes = require("./app/status");
 <%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");
-const mockauthRoutes = require("./mockauth");
-const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");<% end %>
+const { authMiddleware } = require("./middleware/auth");<% end %>
+const statusRoutes = require("./app/status");
 
 dotenv.config();
 const app = express();
@@ -15,13 +13,12 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-<%if eq (index .Params `userAuth`) "yes" %>app.use(jwtDecoder);
-app.use(unAuthErrorHandler);<% end %>
+<%if eq (index .Params `userAuth`) "yes" %>app.use(authMiddleware);
+app.use("/auth", authRoutes);<% end %>
 
 <%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
 
-<%if eq (index .Params `userAuth`) "yes" %>app.use("/auth", authRoutes);<% end %>
-app.use("/mock",mockauthRoutes);
+<%if eq (index .Params `userAuth`) "yes" %><% end %>
 
 app.use("/status", statusRoutes);
 

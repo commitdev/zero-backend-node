@@ -6,7 +6,7 @@ const s3 = new aws.S3();
 class FileService {
     constructor(){}
 
-    getUploadPresignedUrl(key){
+    getUploadSignedUrl(key){
         const params = {
             Bucket: process.env.S3_BUCKET,
             Key: key,
@@ -19,7 +19,7 @@ class FileService {
         };
     }
 
-    getDownloadPresignedUrl(key){
+    getDownloadSignedUrl(key){
         const cloudfrontAccessKeyId = process.env.CF_KEYPAIR_ID;
         const cloudFrontPrivateKey = process.env.CF_KEYPAIR_SECRET_KEY;
         const cloudFrontDomain = process.env.CF_DOMAIN;

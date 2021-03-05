@@ -1,16 +1,12 @@
 const dotenv = require("dotenv");
 const express = require("express");
-
 const morgan = require("morgan");
-const dbDatasource = require("./db");
 const { ApolloServer } = require("apollo-server-express");
 
 const combine = require("graphql-combine");
 const path = require("path");
-<%if eq (index .Params `userAuth`) "yes" %>
-const mockauthRoutes = require("./mockauth");
-const {jwtDecoder, unAuthErrorHandler} = require("./middleware/auth/jwtDecoder");<% end %>
-
+const dbDatasource = require("./db");
+<%if eq (index .Params `userAuth`) "yes" %>const { authMiddleware } = require("./middleware/auth");<% end %>
 
 dotenv.config();
 const app = express();
@@ -18,8 +14,7 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(jwtDecoder);
-app.use(unAuthErrorHandler);
+app.use(authMiddleware);
 
 const {typeDefs, resolvers} = combine({
   typeDefs: path.join(__dirname, "graphql/*.graphql"),
@@ -36,9 +31,6 @@ const server = new ApolloServer({
   resolvers
 });
 server.applyMiddleware({ app });
-
-<%if eq (index .Params `userAuth`) "yes" %>
-app.use("/mock",mockauthRoutes);<% end %>
 
 const port = process.env.SERVER_PORT;
 if (!port) {
