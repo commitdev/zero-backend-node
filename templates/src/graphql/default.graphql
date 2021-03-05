@@ -2,7 +2,6 @@
 This schema is the default graphql schema, please don't remove it.
 """
 
-"The user object for the authentication"
 type User {
   "The user id from the authentication middleware"
   id: ID!
