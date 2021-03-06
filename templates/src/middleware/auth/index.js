@@ -4,7 +4,7 @@ const authMiddleware = (req, res, next) => {
    *  1. X-User-Id
    *  2. X-User-Email
    * */
-  if (inWhitelist(req.path)) {
+  if (inAllowlist(req.path)) {
     next();
   } else {
     const hasUserData = req.headers["x-user-id"] && req.headers["x-user-email"];
@@ -25,11 +25,11 @@ const authMiddleware = (req, res, next) => {
 
 };
 
-//whitelist defines the paths that will not pass the authentication middleware
-const auth_whitelist = ["/status/ready", "/status/alive", "/status/about"];
+//authAllowlist defines the paths that will not pass the authentication middleware
+const authAllowlist = ["/status/ready", "/status/alive", "/status/about"];
 
-const inWhitelist = (path) => {
-  return auth_whitelist.find(element => element === path);
+const inAllowlist = (path) => {
+  return authAllowlist.find(element => element === path);
 }
 
 module.exports = {

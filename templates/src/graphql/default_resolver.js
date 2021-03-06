@@ -3,15 +3,14 @@ const fileService = new FileService();
 
 module.exports = {
     Query: {
-        signedUrls: (_, { key }, context) => {
-            const presignedurls = {
-                upload: fileService.getUploadSignedUrl( key ),
-                download: fileService.getDownloadSignedUrl( key )
-            };
-            return presignedurls;
+        downloadSignedUrl: (_, { key }, context) => {
+            return fileService.getDownloadSignedUrl(key);
         },
-        userInfo: (_, {}, context) => {
+        uploadSignedUrl: (_, { key }, context) => {
+            return fileService.getUploadSignedUrl(key);
+        },
+        userInfo: (_, { }, context) => {
             return context.user;
         }
     },
-}; 
+};

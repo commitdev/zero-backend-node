@@ -19,26 +19,20 @@ type SignedUrl {
 }
 
 """
-A presigned urls collection that contains all presigned urls 
-for a specific file on a cloud storage 
-"""
-type SignedUrls {
-  "The presigned url object for file uploading"
-  upload: SignedUrl
-  "The presigned url object for file downloading"
-  download: SignedUrl
-}
-
-"""
 Type Query defines all query / read methods that clients can call. 
 These methods must be implemented in resolver as well.
 """
 type Query {
   """
-  Get all presigned urls for a specific file 
+  Get download signed urls for a specific file 
   that has been stored or will be stored on a cloud storage
   """
-  signedUrls(key: String!): SignedUrls
+  downloadSignedUrl(key: String!): SignedUrl
+  """
+  Get upload signed urls for a specific file 
+  that has been stored or will be stored on a cloud storage
+  """
+  uploadSignedUrl(key: String!): SignedUrl
   "Get user object from the authentication middleware"
   userInfo: User,
 }
