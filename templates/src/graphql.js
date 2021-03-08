@@ -1,11 +1,12 @@
 const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
+const { ApolloServer } = require("apollo-server-express");
+
+const combine = require("graphql-combine");
+const path = require("path");
 const dbDatasource = require("./db");
-<%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
-<%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");
-const { authMiddleware } = require("./middleware/auth");<% end %>
-const statusRoutes = require("./app/status");
+<%if eq (index .Params `userAuth`) "yes" %>const { authMiddleware } = require("./middleware/auth");<% end %>
 
 dotenv.config();
 const app = express();
@@ -13,12 +14,23 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-<%if eq (index .Params `userAuth`) "yes" %>app.use(authMiddleware);
-app.use("/auth", authRoutes);<% end %>
+app.use(authMiddleware);
 
-<%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
+const {typeDefs, resolvers} = combine({
+  typeDefs: path.join(__dirname, "graphql/*.graphql"),
+  resolvers: path.join(__dirname, "graphql/*_resolver.js")
+});
 
-app.use("/status", statusRoutes);
+const server = new ApolloServer({
+  context: async ( {req} ) => {
+    if(req.user){
+      return { user: {id: req.user.id, email: req.user.email} };
+    }
+  },
+  typeDefs,
+  resolvers
+});
+server.applyMiddleware({ app });
 
 const port = process.env.SERVER_PORT;
 if (!port) {

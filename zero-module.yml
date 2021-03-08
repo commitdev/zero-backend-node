@@ -90,6 +90,12 @@ parameters:
     options:
       - "yes"
       - "no"
+  - field: apiType
+    label: What type of API do you want to expose?
+    default: rest
+    options:
+      - "rest"
+      - "graphql"
   - field: CIVendor
     label: Using either circleCI or github Actions to build / test your repository
     default: "circleci"
@@ -108,9 +114,24 @@ conditions:
     data:
     - src/middleware/auth
     - src/app/auth
+    - src/mockauth.js
     - kubernetes/base/auth.yml
     - kubernetes/overlays/staging/auth.yml
     - kubernetes/overlays/production/auth.yml
+  - action: ignoreFile
+    matchField: apiType
+    whenValue: "rest"
+    data:
+    - src/graphql
+    - src/graphql.js
+    - src/db/model/Trip.js
+    - src/service/trip.js
+  - action: ignoreFile
+    matchField: apiType
+    whenValue: "graphql"
+    data:
+    - src/app
+    - src/app.js    
   - action: ignoreFile
     matchField: CIVendor
     whenValue: "circleci"

@@ -11,7 +11,7 @@ const {
   DATABASE_NAME,
 } = process.env;
 
-const database = new Sequelize(
+const datasource = new Sequelize(
   DATABASE_NAME,
   DATABASE_USERNAME,
   DATABASE_PASSWORD,
@@ -22,16 +22,4 @@ const database = new Sequelize(
   }
 );
 
-const connect = async () => {
-  try {
-    await database.authenticate();
-    console.log("Connection has been established successfully.");
-    return database;
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-};
-
-module.exports = {
-  connect,
-};
+module.exports = datasource;
