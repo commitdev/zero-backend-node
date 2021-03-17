@@ -5,6 +5,9 @@
 
 GITHUB_ORG := $(shell echo ${REPOSITORY} | cut -d "/" -f 2)
 GITHUB_REPO := $(shell echo ${REPOSITORY} | cut -d "/" -f 3)
+RANDOM_SEED := ${randomSeed}
+REGION := ${region}
+PROJECT_NAME := ${PROJECT_NAME}
 
 run: ci_setup
 	@echo "\nDone"
