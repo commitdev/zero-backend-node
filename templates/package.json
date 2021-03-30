@@ -7,7 +7,7 @@
   },
   "main": <%if eq (index .Params `apiType`) "rest" %>"src/app.js", <% else %>"src/graphql.js",<% end %>
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write '**/*.js'"
