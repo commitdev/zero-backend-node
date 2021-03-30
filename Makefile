@@ -9,6 +9,8 @@ RANDOM_SEED := ${randomSeed}
 REGION := ${region}
 PROJECT_NAME := ${PROJECT_NAME}
 
+.EXPORT_ALL_VARIABLES:
+
 run: ci_setup
 	@echo "\nDone"
 
