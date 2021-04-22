@@ -5,7 +5,8 @@ const dbDatasource = require("./db");
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");<% end %>
 <%if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");
 const { authMiddleware } = require("./middleware/auth");<% end %>
-const statusRoutes = require("./app/status");
+<%if eq (index .Params `billingEnabled`) "yes" %>const billingRoutes = require("./app/billing");<% end %>
+const publicRoutes = require("./app/public");
 
 dotenv.config();
 const app = express();
@@ -13,17 +14,19 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// these are placed before the auth middleware, so will not 401 upon non-authenticated requests
+app.use("/", publicRoutes);
+
 <%if eq (index .Params `userAuth`) "yes" %>app.use(authMiddleware);
 app.use("/auth", authRoutes);<% end %>
 
 <%if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
 
-app.use("/status", statusRoutes);
+<%if eq (index .Params `billingEnabled`) "yes" %>app.use("/billing", billingRoutes);<% end %>
 
-const port = process.env.SERVER_PORT;
-if (!port) {
-  port = 3000;
-}
+
+
+const port = process.env.SERVER_PORT || 8080;
 
 const main = async () => {
   // remove this block for development, just for verifying DB

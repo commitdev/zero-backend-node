@@ -40,6 +40,8 @@ spec:
           envFrom:
           - configMapRef:
               name: <% .Name %>-config
+          - secretRef:
+              name: <% .Name %>
           env:
           - name: SERVER_PORT
             value: "80"
@@ -57,17 +59,7 @@ spec:
                 secretKeyRef:
                   name: cf-keypair
                   key: private_key
-<% end %>          - name: DATABASE_USERNAME
-            valueFrom:
-                secretKeyRef:
-                  name: <% .Name %>
-                  key: DATABASE_USERNAME
-          - name: DATABASE_PASSWORD
-            valueFrom:
-                secretKeyRef:
-                  name: <% .Name %>
-                  key: DATABASE_PASSWORD
----
+<% end %>---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
