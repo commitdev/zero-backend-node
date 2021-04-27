@@ -49,7 +49,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-<% if eq (index .Params `fileUploads`) "yes" %>          - name: CF_KEYPAIR_ID
+<%- if eq (index .Params `fileUploads`) "yes" %>
+          - name: CF_KEYPAIR_ID
             valueFrom:
                 secretKeyRef:
                   name: cf-keypair
@@ -59,7 +60,8 @@ spec:
                 secretKeyRef:
                   name: cf-keypair
                   key: private_key
-<% end %>---
+<%- end %>
+---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:

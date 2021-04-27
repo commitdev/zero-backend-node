@@ -16,11 +16,9 @@ router.get("/status/about", (req, res) => {
     podName: podName,
   });
 });
-<%if eq (index .Params `billingEnabled`) "yes" %>
+<% if eq (index .Params `billingEnabled`) "yes" %>
 // Logging out webhooks for development purposes
 router.use("/webhook", (req, res) => {
-  console.log(req.query, req.body);
   res.json({ success:true });
 });<% end %>
-
 module.exports = router;

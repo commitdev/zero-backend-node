@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This script runs only when billingEnabled = "yes", invoked from makefile
+# modify the kubernetes application secret and appends STRIPE_API_SECRET_KEY
+# the deployment by default will pick up all key-value pairs as env-vars from the secret
+
 if [[ "$ENVIRONMENT" == "" ]]; then
   echo "Must specify \$ENVIRONMENT to create stripe secret ">&2; exit 1;
 elif [[ "$ENVIRONMENT" == "stage" ]]; then
@@ -11,19 +15,7 @@ SECRET_API_KEY=$productionStripeSecretApiKey
 fi
 
 CLUSTER_NAME=${PROJECT_NAME}-${ENVIRONMENT}-${REGION}
-STRIPE_SECRET_NAME=${PROJECT_NAME}-${ENVIRONMENT}-stripe-${RANDOM_SEED}
 NAMESPACE=${PROJECT_NAME}
-
-API_KEY_JSON=$(printf '{"public_key":"%s","secret_key":"%s"}' "$PUBLISHABLE_API_KEY" "$SECRET_API_KEY");
-
-aws secretsmanager list-secrets --region $REGION --query "SecretList[?Tags[?Key=='stripe' && Value=='${PROJECT_NAME}-${ENVIRONMENT}']].[Name] | [0][0]"  \
-  || aws secretsmanager create-secret \
-  --region ${REGION} \
-  --name ${STRIPE_SECRET_NAME} \
-  --description "Stripe API Key" \
-  --tags "[{\"Key\":\"stripe\",\"Value\":\"${PROJECT_NAME}-${ENVIRONMENT}\"}]" \
-  --secret-string "${API_KEY_JSON}"
-
 
 BASE64_TOKEN=$(printf ${SECRET_API_KEY} | base64)
 ## Modify existing application secret to have stripe api key

@@ -74,9 +74,4 @@ router.use("/canceled", async (req, res) => {
   res.redirect(`${FRONTEND_URL}/billing/confirmation?&${mapToQueryString(data)}`)
 });
 
-router.use("/webhook*", async (req, res) => {
-  console.log("Stripe webhook received", req.query, req.body)
-  res.send("ok");
-});
-
 module.exports = router

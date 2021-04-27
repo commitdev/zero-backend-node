@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# Creates stripe example for frontend/backend for checkout and subscription
+# the script uses the token and creates the following for the end-to-end example to work
+# - 1 product
+# - 3 plans
+# - 1 webhook
+#
+# If you want to recreate this you can use the curl requests as an example below.
+
 PROJECT_NAME=<% .Name %>
 RANDOM_SEED=<% index .Params `randomSeed` %>
 REGION=<% index .Params `region` %>
@@ -10,17 +18,15 @@ if [[ "$ENVIRONMENT" == "" ]]; then
   exit 1;
 elif [[ "$ENVIRONMENT" == "stage" ]]; then
 BACKEND_API_WEBHOOK_ENDPOINT="https://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/webhook/stripe"
+PUBLISHABLE_API_KEY=$stagingStripePublicApiKey
+SECRET_API_KEY=$stagingStripeSecretApiKey
 elif [[ "$ENVIRONMENT" == "prod" ]]; then
 BACKEND_API_WEBHOOK_ENDPOINT="https://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>/webhook/stripe"
+PUBLISHABLE_API_KEY=$productionStripePublicApiKey
+SECRET_API_KEY=$productionStripeSecretApiKey
 fi
 
-STRIPE_SECRET_NAME=${PROJECT_NAME}-${ENVIRONMENT}-stripe-${RANDOM_SEED}
-STRIPE_API_KEY=$(aws secretsmanager get-secret-value --region ${REGION} \
-  --secret-id=$STRIPE_SECRET_NAME | \
-  jq -r '.SecretString' | jq -r ".secret_key")
-
-# STRIPE_API_KEY="sk_test_51IfTRKFzzFzHAJpZr8sIN9GXizOeBJqT7bwOscPJVYjoBuJuolnUpfdC26GkkZ8gZ0FOEgUGrjFYcT7xhB9VUK8c00Wt6PyWnx"
-TOKEN=$(echo $STRIPE_API_KEY | base64)
+TOKEN=$(echo $SECRET_API_KEY | base64)
 AUTH_HEADER="Authorization: Basic ${TOKEN}"
 
 ## Create Product
