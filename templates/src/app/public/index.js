@@ -18,7 +18,7 @@ router.get("/status/about", (req, res) => {
 });
 <% if eq (index .Params `billingEnabled`) "yes" %>
 // Logging out webhooks for development purposes
-router.use("/webhook", (req, res) => {
+router.use("/webhook/stripe", (req, res) => {
   res.json({ success:true });
 });<% end %>
 module.exports = router;
