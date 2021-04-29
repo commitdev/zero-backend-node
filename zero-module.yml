@@ -211,3 +211,9 @@ conditions:
     whenValue: "github-actions"
     data:
     - .circleci/
+  - action: ignoreFile
+    matchField: billingEnabled
+    whenValue: "no"
+    data:
+    - src/app/billing
+    - scripts/stripe-example-setup.sh
