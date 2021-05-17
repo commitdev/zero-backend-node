@@ -18,4 +18,6 @@ configMapGenerator:
   literals:
     - ENVIRONMENT=production
     - DOMAIN=<% index .Params `productionHostRoot` %>
+    - BACKEND_URL=https://<% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>
+    - FRONTEND_URL=https://<% index .Params `productionFrontendSubdomain` %><% index .Params `productionHostRoot` %>
     - S3_BUCKET=files.<% index .Params `productionHostRoot` %>

@@ -17,4 +17,6 @@ configMapGenerator:
   literals:
     - ENVIRONMENT=staging
     - DOMAIN=<% index .Params `stagingHostRoot` %>
+    - BACKEND_URL=https://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>
+    - FRONTEND_URL=https://<% index .Params `stagingFrontendSubdomain` %><% index .Params `stagingHostRoot` %>
     - S3_BUCKET=files.<% index .Params `stagingHostRoot` %>

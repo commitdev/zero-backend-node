@@ -40,6 +40,8 @@ spec:
           envFrom:
           - configMapRef:
               name: <% .Name %>-config
+          - secretRef:
+              name: <% .Name %>
           env:
           - name: SERVER_PORT
             value: "80"
@@ -47,7 +49,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-<% if eq (index .Params `fileUploads`) "yes" %>          - name: CF_KEYPAIR_ID
+<%- if eq (index .Params `fileUploads`) "yes" %>
+          - name: CF_KEYPAIR_ID
             valueFrom:
                 secretKeyRef:
                   name: cf-keypair
@@ -57,16 +60,7 @@ spec:
                 secretKeyRef:
                   name: cf-keypair
                   key: private_key
-<% end %>          - name: DATABASE_USERNAME
-            valueFrom:
-                secretKeyRef:
-                  name: <% .Name %>
-                  key: DATABASE_USERNAME
-          - name: DATABASE_PASSWORD
-            valueFrom:
-                secretKeyRef:
-                  name: <% .Name %>
-                  key: DATABASE_PASSWORD
+<%- end %>
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
