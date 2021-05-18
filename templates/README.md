@@ -13,15 +13,15 @@ kubectl -n <% .Name %> get pods
 You can update the resource limits in the [kubernetes/base/deployment.yml][base-deployment], and control fine-grain customizations based on environment and specific deployments such as Scaling out your production replicas from the [overlays configurations][env-prod]
 
 ### Dev Environment
-This project is set up with a local/cloud hybrid dev environment. This means you can do fast local development of a single service, even if that service depends on other resources in your cluster. 
+This project is set up with a local/cloud hybrid dev environment. This means you can do fast local development of a single service, even if that service depends on other resources in your cluster.
 Make a change to your service, run it, and you can immediately see the new service in action in a real environment. You can also use any tools like your local IDE, debugger, etc. to test/debug/edit/run your service.
 
-Usually when developing you would run the service locally with a local database and any other dependencies running either locally or in containers using `docker-compose`, `minikube`, etc. 
+Usually when developing you would run the service locally with a local database and any other dependencies running either locally or in containers using `docker-compose`, `minikube`, etc.
 Now your service will have access to any dependencies within a namespace running in the EKS cluster, with access to resources there.
-[Telepresence](https://telepresence.io) is used to provide this functionality. 
+[Telepresence](https://telepresence.io) is used to provide this functionality.
 
  Development workflow:
- 
+
   1. Run `start-dev-env.sh` - You will be dropped into a shell that is the same as your local machine, but works as if it were running inside a pod in your k8s cluster
   2. Change code and run the server - As you run your local server, using local code, it will have access to remote dependencies, and will be sent traffic by the load balancer
   3. Test on your cloud environment with real dependencies - `https://<your name>-<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>`
@@ -61,8 +61,21 @@ By default it requires `[lint, unit-test]` to be passing to allow Pull requests 
 <% end %>
 
 ## Database credentials
-Your application is assumed[(ref)][base-deployment-secret] to rely on a database(RDS), In your Kubernetes
-application namespace, an application specific user has been created for you and hooked up to the application already.
+Your application is assumed to rely on a database. An application-specific user has been created for you by the `/scripts/create-db-user.sh` script in the infrastructure project.
+A Kubernetes secret will exist in your application namespace (<% .Name %>) that will provide these credentials to your application.
+
+## Secrets
+Along with the database credentials, any other secrets that need to be provided to the application can be managed in AWS Secrets Manager.
+Secrets have been created for each environment called `<% .Name %>/kubernetes/<environment>/<% .Name %>` which contain a list of environment variables that will be synced with the kubernetes secret in your namespace via a tool called [external-secrets](https://github.com/external-secrets/kubernetes-external-secrets)
+Any secrets managed by `external-secrets` will be synced to kubernetes every 15 seconds. Keep in mind that any changes must be made in Secrets Manager, as any that are made to the secret on the kubernetes side will be overwritten.
+You can see the `external-secrets` configuration in [kubernetes/overlays/staging/external-secret.yml](./kubernetes/overlays/staging/external-secret.yml) (this is the one for staging)
+
+To work with the secret in AWS you can use the web interface or the cli tool:
+```
+ aws secretsmanager get-secret-value --secret=<% .Name %>/kubernetes/stage/<% .Name %>
+```
+
+The intent is that the last part of the secret name is the component of your application this secret is for. For example: if you were adding a new billing service, the secret might be called `<% .Name %>/kubernetes/stage/billing`
 
 ## Cron Jobs
 An example cron job is specified in [kubernetes/base/cronjob.yml][base-cronjob].
@@ -136,6 +149,5 @@ The deployment only requires the environment variables:
 <!-- Links -->
 [base-cronjob]: ./kubernetes/base/cronjob.yml
 [base-deployment]: ./kubernetes/base/deployment.yml
-[base-deployment-secret]: ./kubernetes/base/deployment.yml#L49-58
 [env-prod]: ./kubernetes/overlays/production/deployment.yml
 [circleci-details]: ./.circleci/README.md
