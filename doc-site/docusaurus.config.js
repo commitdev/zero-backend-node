@@ -3,7 +3,7 @@ const { downloadCommonCustomCss, themeConfig, stylesheets, misc } = require('@co
 
 const siteUrl = process.env.BUILD_DOMAIN ? `https://${process.env.BUILD_DOMAIN}` : 'https://staging.getzero.dev';
 const baseUrl = '/docs/modules/backend-nodejs/';
-const repositoryName = 'zero-deployable-node-backend';
+const repositoryName = 'zero-backend-node';
 
 let customCss;
 try {
