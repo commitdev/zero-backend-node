@@ -8,11 +8,11 @@ metadata:
 spec:
   upstream:
     # DEV_NAMESPACE is filled in by start-dev-env.sh
-    url: http://<% .Name %>.$DEV_NAMESPACE
-    stripPath: /$DEV_NAMESPACE
+    url: http://<% .Name %>.{{ DEV_NAMESPACE }}
+    stripPath: /{{ DEV_NAMESPACE }}
     preserveHost: true
   match:
-    url: http://$DEV_NAMESPACE.dev.<% index .Params `stagingHostRoot` %>/<(status|webhook)\/.*>
+    url: http://{{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>/<(status|webhook)\/.*>
 ---
 ## Backend User-restricted endpoint
 # pattern: http://<proxy>/<not `status`/`.ory/kratos`>, everything else should be authenticated
@@ -27,10 +27,10 @@ metadata:
 spec:
   upstream:
     preserveHost: true
-    url: http://<% .Name %>.$DEV_NAMESPACE
-    stripPath: /$DEV_NAMESPACE
+    url: http://<% .Name %>.{{ DEV_NAMESPACE }}
+    stripPath: /{{ DEV_NAMESPACE }}
   match:
-    url: http://$DEV_NAMESPACE.dev.<% index .Params `stagingHostRoot` %>/<(?!(status|webhook|\.ory\/kratos)).*>
+    url: http://{{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>/<(?!(status|webhook|\.ory\/kratos)).*>
   authenticators:
     - handler: cookie_session
       config:

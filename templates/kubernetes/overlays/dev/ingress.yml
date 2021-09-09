@@ -52,19 +52,19 @@ metadata:
 
 spec:
   rules:
-  - host: <% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>
+  - host: {{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>
     http:
       paths:
         - path: /(.*)
           backend:
           <%- if eq (index .Params `userAuth`) "yes" %>
             serviceName: oathkeeper
-            servicePort: http
+            servicePort: 4455
           <%- else %>
             serviceName: <% .Name %>
             servicePort: http
           <%- end %>
   tls:
   - hosts:
-    - <% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>
+    - {{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>
     secretName: <% .Name %>-tls-secret
