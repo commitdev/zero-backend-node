@@ -36,7 +36,7 @@ router.get("/products", (req, res) => {
 router.use("/checkout", (req, res) => {
   // should throw if not available, since theres nothing to checkout
   const { price_id } = req.body;
-  createCheckoutPayload = {
+  const createCheckoutPayload = {
     mode: "subscription",
     payment_method_types: ["card"],
      // this would be your internal userID(if auth is enabled) or a random generated ID
@@ -45,9 +45,14 @@ router.use("/checkout", (req, res) => {
     success_url: `${BACKEND_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${BACKEND_URL}/billing/canceled`,
   }
-  stripe.checkout.sessions.create(createCheckoutPayload).then((session) => res.json({
-    sessionId: session.id,
-  }))
+  stripe.checkout.sessions
+    .create(createCheckoutPayload)
+    .then((session) => res.json({ sessionId: session.id }))
+    .catch((e) => {
+      console.log(e);
+      res.status(500);
+      res.json({ message: "Failed to checkout Stripe session." });
+    });
 });
 
 

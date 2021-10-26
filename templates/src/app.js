@@ -1,6 +1,12 @@
 const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
+<%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+// To wrap express in lambda compatible export
+const serverless = require("serverless-http");
+const AWSXRay = require('aws-xray-sdk');
+<% end %>
+
 const dbDatasource = require("./db");
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");
 <%- end %>
@@ -18,12 +24,24 @@ const publicRoutes = require("./app/public");
 dotenv.config();
 const app = express();
 app.use(morgan("combined"));
+<%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+app.use(AWSXRay.express.openSegment('<% .Name %>'));
+<%- end %>
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // these are placed before the auth middleware, so will not 401 upon non-authenticated requests
 app.use("/", publicRoutes);
 
+<%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+app.use("/status/db", (req, res, next) => {
+  dbDatasource.authenticate().then(() => {
+    dbDatasource.query("SELECT 1").then((dbResp) => {
+      res.json(dbResp);
+    });
+  });
+});
+<% end %>
 <% if eq (index .Params `userAuth`) "yes" %>app.use(authMiddleware);
 app.use("/auth", authRoutes);<% end %>
 <% if eq (index .Params `fileUploads`) "yes" %>app.use("/file", fileRoutes);<% end %>
@@ -66,5 +84,13 @@ const main = async () => {
   });
 };
 
+<%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+app.use(AWSXRay.express.closeSegment());
+// Run traditional http server instead of lambda export
+if (process.env.NODE_ENV === 'development') {
+  main();
+}
+module.exports.lambdaHandler = serverless(app);
+<% else %>
 main();
-
+<% end %>

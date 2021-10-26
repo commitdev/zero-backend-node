@@ -1,9 +1,21 @@
+<% if eq (index .Params `backendApplicationHosting`) "serverless" -%>
+// For Lambda Authorizer proxy passing JWT contenxt via to Lambda requestContext
 const authMiddleware = (req, res, next) => {
-  /** Expecting oathkeeper to pass on user identity in headers
-   *  (note nodejs converts all headers to lowercase)
-   *  1. X-User-Id
-   *  2. X-User-Email
-   * */
+  // comes from authrozier's Context
+  const { sub, email, name } = req.requestContext?.authorizer?.lambda || {};
+  if (sub && email) {
+    req.user = {id: sub, sub, email, name};
+  }
+  next();
+};
+
+/* // For Oathkeeper proxy translating JWT to headers
+<% end -%>
+const authMiddleware = (req, res, next) => {
+  // Expecting oathkeeper to pass on user identity in headers
+  // (note nodejs converts all headers to lowercase)
+  //  1. X-User-Id
+  //  2. X-User-Email
   if (inAllowlist(req.path)) {
     next();
   } else {
@@ -31,7 +43,9 @@ const authAllowlist = ["/status/ready", "/status/alive", "/status/about"];
 const inAllowlist = (path) => {
   return authAllowlist.find(element => element === path);
 }
-
+<%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+*/
+<% end %>
 module.exports = {
   authMiddleware,
 };

@@ -14,7 +14,7 @@ else
   echo 'Must specify $ENVIRONMENT (stage/prod) to create stripe secret'>&2; exit 1;
 fi
 
-SECRET_NAME=${PROJECT_NAME}/kubernetes/${ENVIRONMENT}/${PROJECT_NAME}
+SECRET_NAME=${PROJECT_NAME}/application/${ENVIRONMENT}/${PROJECT_NAME}
 
 # Modify existing application secret to add stripe api key
 UPDATED_SECRET=$(aws secretsmanager get-secret-value --region ${REGION} --secret=${SECRET_NAME} --query "SecretString" --output text | \

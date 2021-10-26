@@ -100,3 +100,6 @@ $RECYCLE.BIN/
 # application environment config
 .env
 node_modules
+
+# Serverless build artifacts
+.aws-sam

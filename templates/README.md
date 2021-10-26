@@ -4,6 +4,23 @@
 You now have a repo to start writing your backend logic! The Go api comes with an endpoint returning the status of the app.
 
 # Deployment
+
+<%- if eq (index .Params `backendApplicationHosting`) "serverless"  %>
+## AWS Serverless Application Model
+Your application is deployed to AWS using [SAM](https://aws.amazon.com/serverless/sam/). The main building blocks includes
+- API Gateway
+- Lambda Authorizer
+- Lambda container Application (Your application)
+
+### Configuring
+The application is configured by `template.yaml` and declares the API gateway, Authorizer, and Application. The config file is also responsible for per environment and environment variables and invoke Lambda roles and Domain setup with API gateway.
+
+There are also a Parameters file with your repository `.sam-params-stage` and `.sam-params-prod`, they are used for CI to pick up these values, consist of `Environment`, `HostedZoneId` and `GatewayCertificateArn`. This is created during the `init` step and committed to your repo, The cert ARN and hostedZoneID are not sensitive but requires list all permissions in IAM, therefore are created here instead of granting the CI user those permission to fetch on the fly, and they should not change often.
+
+### Deployment
+The deployment is configured from `config.toml`, and triggered from Github Actions `.github/workflows/sam.yml`, this declares the staging and production SAM deployment artifacts destination and settings.
+
+<%- else %>
 ## Kubernetes
 Your application is deployed on your EKS cluster through circleCI, you can see the pod status on kubernetes in your application namespace:
 ```
@@ -126,7 +143,8 @@ ALTER TABLE address
  ADD COLUMN city VARCHAR(30) AFTER street_name,
  ADD COLUMN province VARCHAR(30) AFTER city
 ```
-<%if eq (index .Params `billingEnabled`) "yes" %>
+<% end %>
+<% if eq (index .Params `billingEnabled`) "yes" %>
 ## Billing example
 A subscription and checkout example using [Stripe](https://stripe.com), coupled with the frontend repository to provide an end-to-end checkout example for you to customize. We also setup a webhook and an endpoint in the backend to receive webhook when events occur.
 
