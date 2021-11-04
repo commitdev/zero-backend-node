@@ -9,6 +9,8 @@ const { authMiddleware } = require("./middleware/auth");
 <%- end %>
 <%- if eq (index .Params `billingEnabled`) "yes" %>const billingRoutes = require("./app/billing");
 <%- end %>
+<%if eq (index .Params `cacheStore`) "memcached" %>const cacheStore = require('./cacheStore');
+<%- end %>
 const publicRoutes = require("./app/public");
 
 dotenv.config();
@@ -26,6 +28,15 @@ app.use("/auth", authRoutes);<% end %>
 <% if eq (index .Params `billingEnabled`) "yes" %>app.use("/billing", billingRoutes);<% end %>
 
 const port = process.env.SERVER_PORT || 8080;
+
+<%if eq (index .Params `cacheStore`) "memcached" %>
+function touchMemcache() {
+  var memcached = cacheStore;
+  memcached.set('foo', 'bar', 10, function (err) {if (err) throw new Error(err); console.log("Set operation successful")});
+  memcached.get('foo', function (err, data) {if (err) throw new Error(err); console.log(`Get operation successful, key: ${data}`)});
+};
+touchMemcache();
+<% end %>
 
 const main = async () => {
   // remove this block for development, just for verifying DB
