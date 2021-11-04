@@ -38,6 +38,9 @@
     <%- if eq (index .Params `billingEnabled`) "yes" %>,
     "stripe": "^8.143.0"
     <%- end %>
+    <%- if eq (index .Params `cacheStore`) "memcached" %>,
+    "memcached": "^2.2.2"
+    <% end %>
   },
   "devDependencies": {
     "eslint": "^7.10.0",
