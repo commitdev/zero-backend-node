@@ -4,10 +4,14 @@ const morgan = require("morgan");
 const dbDatasource = require("./db");
 <%if eq (index .Params `fileUploads`) "yes" %>const fileRoutes = require("./app/file");
 <%- end %>
-<%- if eq (index .Params `userAuth`) "yes" %>const authRoutes = require("./app/auth");
+<%- if eq (index .Params `userAuth`) "yes" %>
+const authRoutes = require("./app/auth");
 const { authMiddleware } = require("./middleware/auth");
 <%- end %>
-<%- if eq (index .Params `billingEnabled`) "yes" %>const billingRoutes = require("./app/billing");
+<%- if eq (index .Params `billingEnabled`) "yes" %>
+const billingRoutes = require("./app/billing");
+<%- end %>
+<%if eq (index .Params `cacheStore`) "memcached" %>const cacheStore = require('./cacheStore');
 <%- end %>
 const publicRoutes = require("./app/public");
 
@@ -27,8 +31,25 @@ app.use("/auth", authRoutes);<% end %>
 
 const port = process.env.SERVER_PORT || 8080;
 
+<%if ne (index .Params `cacheStore`) "none" %>
+function touchCacheStore() {
+  // memcached example getting and setting key value
+  cacheStore.set('foo', 'bar', 10,
+    function (err) {
+      if (err) throw new Error(err);
+      console.log("Set operation successful");
+    });
+  cacheStore.get('foo',
+    function (err, data) {
+      if (err) throw new Error(err);
+      console.log(`Get operation successful, key: ${data}`)
+    });
+};
+<% end %>
+
 const main = async () => {
   // remove this block for development, just for verifying DB
+  <% if ne (index .Params `cacheStore`) "none" %>touchCacheStore();<% end %>
   try {
     await dbDatasource.authenticate();
     console.log("Connection has been established successfully.");

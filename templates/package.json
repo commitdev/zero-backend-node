@@ -28,6 +28,9 @@
     "express": "^4.17.1",
     "express-busboy": "^8.0.0",
     "morgan": "^1.10.0",
+    <%- if eq (index .Params `cacheStore`) "memcached" %>
+    "memcached": "^2.2.2",
+    <% end %>
     <%- if eq (index .Params `database`) "postgres" %>
     "pg": "^8.4.1",
     "pg-hstore": "^2.3.3",
