@@ -42,11 +42,6 @@ circle_ci_setup:
 github_actions_setup:
 	sh scripts/gha-setup.sh setup
 
-serverless_setup:
-ifeq ($(backendApplicationHosting), serverless)
-	sh scripts/serverless-setup.sh
-endif
-
 summary:
 	@echo "zero-backend-node:"
 	@echo "- Repository URL: ${REPOSITORY}"
