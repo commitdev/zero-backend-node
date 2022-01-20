@@ -11,8 +11,7 @@ PROJECT_NAME := ${PROJECT_NAME}
 
 .EXPORT_ALL_VARIABLES:
 
-# run: ci_setup billing_setup serverless_setup
-run: ci_setup billing_setup serverless_setup
+run: ci_setup billing_setup
 	@echo "\nDone"
 
 ci_setup:
