@@ -186,11 +186,11 @@ Resources:
               Authorizer: NONE
       Environment:
         Variables:
-          ISSUER_BASE_URL: !Join ["", ["https://", !Sub '{{resolve:secretsmanager:/<% .Name %>/sam/${Environment}/auth-oidc:SecretString:DOMAIN}}' ]]
-          CLIENT_ID: !Sub '{{resolve:secretsmanager:/<% .Name %>/sam/${Environment}/auth-oidc:SecretString:CLIENT_ID}}'
-          CLIENT_SECRET: !Sub '{{resolve:secretsmanager:/<% .Name %>/sam/${Environment}/auth-oidc:SecretString:CLIENT_SECRET}}'
+          ISSUER_BASE_URL: !Join ["", ["https://", !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:DOMAIN}}' ]]
+          CLIENT_ID: !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:CLIENT_ID}}'
+          CLIENT_SECRET: !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:CLIENT_SECRET}}'
           COOKIE_DOMAIN: !FindInMap [ParamsMap, !Ref Environment, backendDomain]
-          COOKIE_SIGNING_SECRET: !Sub '{{resolve:secretsmanager:/<% .Name %>/sam/${Environment}/auth-oidc:SecretString:COOKIE_SIGNING_SECRET}}'
+          COOKIE_SIGNING_SECRET: !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:COOKIE_SIGNING_SECRET}}'
           AUTH_ENDPOINT: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, backendDomain]]]
           FRONTEND_URL: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, frontendDomain]]]
   GatewayInvokeAuthRole:
