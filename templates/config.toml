@@ -22,3 +22,4 @@ region = "<% index .Params `region` %>"
 confirm_changeset = false
 capabilities = "CAPABILITY_NAMED_IAM"
 image_repositories = ["Application=<% index .Params `accountId` %>.dkr.ecr.<% index .Params `region` %>.amazonaws.com/<% .Name %>-serverless"]
+parameter_overrides = "Environment=prod"
