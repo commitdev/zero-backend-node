@@ -31,7 +31,7 @@ app.use("/auth", authRoutes);<% end %>
 
 const port = process.env.SERVER_PORT || 8080;
 
-<%if ne (index .Params `cacheStore`) "none" %>
+<%if eq (index .Params `cacheStore`) "memcached" %>
 function touchCacheStore() {
   // memcached example getting and setting key value
   cacheStore.set('foo', 'bar', 10,
@@ -49,7 +49,7 @@ function touchCacheStore() {
 
 const main = async () => {
   // remove this block for development, just for verifying DB
-  <% if ne (index .Params `cacheStore`) "none" %>touchCacheStore();<% end %>
+  <% eq (index .Params `cacheStore`) "memcached" %>touchCacheStore();<% end %>
   try {
     await dbDatasource.authenticate();
     console.log("Connection has been established successfully.");
