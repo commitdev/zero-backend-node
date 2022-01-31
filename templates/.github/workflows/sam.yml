@@ -1,0 +1,107 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+      - 'feature**'
+
+env:
+  REGION: <% index .Params `region` %>
+  CI_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  CI_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  SAM_TEMPLATE: template.yaml
+  STAGE_STACK_NAME: <% .Name %>-stage
+  PROD_STACK_NAME: <% .Name %>-prod
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          # trigger the tests here
+  build-and-deploy-feature-stage:
+    # this stage is triggered only for feature branches (feature*),
+    # which will build the stack and deploy to a stack named with branch name.
+    # if: startsWith(github.ref, 'refs/heads/feature')
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: actions/setup-node@v2
+      # Modules get packaged into lambda functions with the node_modules folder
+      # so we must obtain the modules inside CI
+      - name: Install Lambda Authorizer modules
+        run: |
+          cd ./auth &&
+          npm install --production
+      - uses: aws-actions/setup-sam@v1
+      - run: |
+          sam build \
+          --template ${SAM_TEMPLATE} \
+          --use-container
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.CI_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.CI_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+      - name: Deploy to feature stack in the testing account
+        shell: bash
+        run: |
+          sam deploy \
+            --template ${SAM_TEMPLATE} \
+            --config-file ./config.toml \
+            --config-env stage \
+            --region ${REGION} \
+            --no-fail-on-empty-changeset
+
+  integration-test:
+    needs: [build-and-deploy-feature-stage]
+    runs-on: ubuntu-latest
+    steps:
+    ## Example of smoke test against staging env before deploying to production
+    ## To be enhanced to more sophisicated checks
+    - run: echo "TEST_RESPONSE_COD=$(curl -o /dev/null -s -w \"%{http_code}\" https://<% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>/status/ready)" >> $GITHUB_ENV
+    - if: env.TEST_RESPONSE_COD >= 400
+      run: exit 1
+
+  build-and-deploy-feature-prod:
+    # this stage is triggered only for feature branches (feature*),
+    # which will build the stack and deploy to a stack named with branch name.
+    # if: startsWith(github.ref, 'refs/heads/feature')
+    needs: [integration-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: actions/setup-node@v2
+      # Modules get packaged into lambda functions with the node_modules folder
+      # so we must obtain the modules inside CI
+      - name: Install Lambda Authorizer modules
+        run: |
+          cd ./auth &&
+          npm install --production
+      - uses: aws-actions/setup-sam@v1
+      - run: |
+          sam build \
+          --template ${SAM_TEMPLATE} \
+          --use-container
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.CI_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.CI_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+      - name: Deploy to feature stack in Production
+        shell: bash
+        run: |
+          sam deploy \
+            --template ${SAM_TEMPLATE} \
+            --config-file ./config.toml \
+            --config-env prod \
+            --region ${REGION} \
+            --no-fail-on-empty-changeset

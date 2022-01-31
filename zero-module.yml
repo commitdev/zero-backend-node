@@ -1,7 +1,7 @@
 name: zero-backend-node
 description: 'Zero module for a backend service in Node.js running in Kubernetes'
 author: 'Commit'
-zeroVersion: '>= 0.1.1'
+zeroVersion: '>= 0.2.1'
 commands:
   check: sh scripts/check.sh
 
@@ -22,6 +22,13 @@ requiredCredentials:
   - github
 
 parameters:
+  - field: backendApplicationHosting
+    label: How do you want to host the backend of your application?
+    info: "Kubernetes is more complex and expensive, but significantly more feature-rich. The serverless approach can be cheaper but is limited in tooling.\nWe recommend Kubernetes for all but the most simple applications. See why: https://whyk8s.getzero.dev"
+    default: "kubernetes"
+    options:
+      "kubernetes": "Kubernetes using AWS EKS"
+      "serverless": "(BETA) Serverless using AWS SAM/Lambda"
   - field: useExistingAwsProfile
     label: "Use credentials from an existing AWS profile?"
     info: "You can choose either a currently existing profile if you've already configured your AWS CLI, or manually enter a pair of AWS access keys."
@@ -196,6 +203,13 @@ parameters:
     - action: KeyMatchCondition
       matchField: billingEnabled
       whenValue: "yes"
+  - field: cacheStore
+    label: "Whether to use cacheStore"
+    info: "Options of cache store include Redis/Memcached"
+    options:
+      "none": "none"
+      "memcached": "Memcached"
+      "redis": "Redis"
 conditions:
   - action: ignoreFile
     matchField: fileUploads
@@ -242,3 +256,12 @@ conditions:
     data:
     - src/app/billing
     - scripts/stripe-example-setup.sh
+  - action: ignoreFile
+    matchField: backendApplicationHosting
+    whenValue: "kubernetes"
+    data:
+    - auth
+    - .github/workflows/sam.yml
+    - config.toml
+    - template.yaml
+    - Dockerfile.sam

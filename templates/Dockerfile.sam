@@ -1,0 +1,8 @@
+FROM public.ecr.aws/lambda/nodejs:14
+
+COPY . .
+
+RUN touch .env
+RUN npm i --production
+
+CMD ["src/app.lambdaHandler"]

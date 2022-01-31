@@ -7,9 +7,17 @@
 # - run smoke test against staging enviroment
 # - deploy to production
 name: CI Pipeline
+<% if eq (index .Params `backendApplicationHosting`) "serverless" -%>
+on:
+  workflow_dispatch # Manual dispatch, when CI flow is disabled for syntax completeness
+# # uncomment `push` to use CI with Kubernetes Cluster
+#   push:
+#     branches: [master, main]
+<% else %>
 on:
   push:
     branches: [master, main]
+<% end -%>
 env:
   # Environment variables shared across jobs and doesn't change per environment
   region: <% index .Params `region` %>

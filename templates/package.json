@@ -23,6 +23,10 @@
     "graphql-combine": "^1.0.1",
     <%- end %>
     "aws-cloudfront-sign": "^2.2.0",
+    <%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+    "aws-xray-sdk": "^3.3.3",
+    "aws-xray-sdk-core": "^3.3.3",
+    <%- end %>
     "aws-sdk": "^2.744.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -36,6 +40,9 @@
     "pg-hstore": "^2.3.3",
     <%- else if eq (index .Params `database`) "mysql" %>
     "mysql2": "^2.2.5",
+    <%- end %>
+    <%- if eq (index .Params `backendApplicationHosting`) "serverless" %>
+    "serverless-http": "^2.7.0",
     <%- end %>
     "sequelize": "^6.3.5"
     <%- if eq (index .Params `billingEnabled`) "yes" %>,

@@ -1,0 +1,270 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  <% .Name %>
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Parameters:
+  Environment:
+    Description: Environment type.
+    Default: stage
+    Type: String
+    AllowedValues: [prod, stage]
+    ConstraintDescription: must specify prod or stage
+
+Mappings:
+  ParamsMap:
+    stage:
+      frontendDomain: <% index .Params `stagingFrontendSubdomain` %><% index .Params `stagingHostRoot` %>
+      backendDomain: <% index .Params `stagingBackendSubdomain` %><% index .Params `stagingHostRoot` %>
+      logDestinationArn: arn:aws:logs:<% index .Params `region` %>:<% index .Params `accountId` %>:log-group:/aws/sam/<% .Name %>/stage:*
+      stackName: <% .Name %>-stage
+    prod:
+      frontendDomain: <% index .Params `productionFrontendSubdomain` %><% index .Params `productionHostRoot` %>
+      backendDomain: <% index .Params `productionBackendSubdomain` %><% index .Params `productionHostRoot` %>
+      logDestinationArn: arn:aws:logs:<% index .Params `region` %>:<% index .Params `accountId` %>:log-group:/aws/sam/<% .Name %>/prod:*
+      stackName: <% .Name %>-prod
+
+Resources:
+  AppGateway:
+    Type: AWS::Serverless::HttpApi # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CorsConfiguration:
+        AllowCredentials: true
+        AllowMethods:
+          - GET
+          - PUT
+          - POST
+          - DELETE
+          - PATCH
+          - OPTIONS
+        AllowOrigins:
+          - !Join [ "", [ "https://", !FindInMap [ParamsMap, !Ref Environment, frontendDomain] ]]
+        AllowHeaders:
+          - Content-Type
+          - Access-Control-Allow-Headers
+          - Authorization
+          - X-Requested-With
+          - Cookie
+        ExposeHeaders:
+          - Content-Length
+          - Content-Range
+          - Location
+      Domain:
+        DomainName: !FindInMap [ParamsMap, !Ref Environment, backendDomain]
+        CertificateArn: !Sub '{{resolve:ssm:/<% .Name %>/sam/${Environment}/gateway-cert-arn}}'
+        EndpointConfiguration: REGIONAL
+        Route53:
+          # aws route53 list-hosted-zones  --query "HostedZones[?Name == 'zero-david.xyz.'].Id"  | jq -r '.[0]' | sed 's/\/hostedzone\///'
+          HostedZoneId: !Sub '{{resolve:ssm:/<% .Name %>/sam/${Environment}/hosted-zone-id}}'
+      AccessLogSettings:
+        DestinationArn: !FindInMap [ParamsMap, !Ref Environment, logDestinationArn]
+        Format: "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.authorizer.error"
+      Auth:
+        DefaultAuthorizer: OIDC
+        Authorizers:
+          OIDC:
+            FunctionArn: !GetAtt AuthOIDC.Arn
+            FunctionInvokeRole: !GetAtt GatewayInvokeAuthRole.Arn
+            Identity:
+              Headers:
+              - Cookie
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+  Application:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Tracing: Active
+      PackageType: Image
+      ImageUri: application:nodejs14.x-v1
+      Role: !Sub '{{resolve:ssm:/<% .Name %>/sam/${Environment}/lambda-execution-role-arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - !Sub '{{resolve:ssm:/<% .Name %>/sam/${Environment}/security-group-id}}'
+        SubnetIds:
+        # Cloudformation executes !Spilt before !Sub therefore we cannot use StringList or comma separate values and split it
+          - !Sub '{{resolve:ssm:/<% .Name %>/sam/${Environment}/vpc-subnet-0}}'
+          - !Sub '{{resolve:ssm:/<% .Name %>/sam/${Environment}/vpc-subnet-1}}'
+      Events:
+        ## This cannot be Method "Any" because the OPTIONS call will
+        ## end up matching into the function and 500 the preflight
+        ## request, instead let the API gateway handle it(default)
+        AuthenticatedGET:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /{proxy+}
+            Method: get
+        AuthenticatedPOST:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /{proxy+}
+            Method: post
+        AuthenticatedPUT:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /{proxy+}
+            Method: put
+        AuthenticatedPATCH:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /{proxy+}
+            Method: patch
+        AuthenticatedDELETE:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /{proxy+}
+            Method: delete
+        PublicRoutes:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /status/{proxy+}
+            Method: get
+            Auth:
+              Authorizer: NONE
+      Environment:
+        Variables:
+          DATABASE_ENGINE: <% index .Params `database` %>
+          DATABASE_CONNECTION_STRING: !Sub '{{resolve:secretsmanager:<% .Name  %>/application/${Environment}/<% .Name  %>:SecretString:DATABASE_CONNECTION_STRING}}'
+          <% if ne (index .Params `billingEnabled`) "yes" %># <%- end -%>
+          STRIPE_API_SECRET_KEY: !Sub '{{resolve:secretsmanager:<% .Name  %>/application/${Environment}/<% .Name  %>:SecretString:STRIPE_API_SECRET_KEY}}' # Billing secret
+          <% if ne (index .Params `billingEnabled`) "yes" %># <%- end -%>
+          BACKEND_URL: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, backendDomain]]] # Billing redirect
+          <% if ne (index .Params `billingEnabled`) "yes" %># <%- end -%>
+          FRONTEND_URL: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, frontendDomain]]] # Billing redirect
+    Metadata:
+      DockerTag: nodejs14.x-v1
+      DockerContext: ./
+      Dockerfile: Dockerfile.sam
+  AuthOIDC:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: auth/
+      Handler: oidc.lambdaHandler
+      Runtime: nodejs14.x
+      Events:
+        Login:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /login
+            Method: get
+            Auth:
+              Authorizer: NONE
+        Logout:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /logout
+            Method: get
+            Auth:
+              Authorizer: NONE
+        Callback:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /callback
+            Method: get
+            Auth:
+              Authorizer: NONE
+        Whoami:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AppGateway
+            Path: /whoami
+            Method: get
+            Auth:
+              Authorizer: NONE
+      Environment:
+        Variables:
+          ISSUER_BASE_URL: !Join ["", ["https://", !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:DOMAIN}}' ]]
+          CLIENT_ID: !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:CLIENT_ID}}'
+          CLIENT_SECRET: !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:CLIENT_SECRET}}'
+          COOKIE_DOMAIN: !FindInMap [ParamsMap, !Ref Environment, backendDomain]
+          COOKIE_SIGNING_SECRET: !Sub '{{resolve:secretsmanager:<% .Name %>/sam/${Environment}/auth-oidc:SecretString:COOKIE_SIGNING_SECRET}}'
+          AUTH_ENDPOINT: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, backendDomain]]]
+          FRONTEND_URL: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, frontendDomain]]]
+  GatewayInvokeAuthRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Join ["-", [!FindInMap [ParamsMap, !Ref Environment, stackName], "invoke-authorizer-role"]]
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: !Join ["-", [!FindInMap [ParamsMap, !Ref Environment, stackName], "invoke-authorizer-policy"]]
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+              - lambda:InvokeFunction
+              Resource: !GetAtt AuthOIDC.Arn
+  ApiGwAccountConfig:
+    Type: "AWS::ApiGateway::Account"
+    Properties:
+      CloudWatchRoleArn: !GetAtt "ApiGatewayLoggingRole.Arn"
+  ApiGatewayLoggingRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:PutResourcePolicy
+                  - logs:UpdateLogDelivery
+                  - logs:DeleteLogDelivery
+                  - logs:CreateLogGroup
+                  - logs:DescribeResourcePolicies
+                  - logs:GetLogDelivery
+                  - logs:ListLogDeliveries
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:GetLogEvents
+                  - logs:FilterLogEvents
+                Resource: !FindInMap [ParamsMap, !Ref Environment, logDestinationArn]
+      Path: "/"
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  Environment:
+    Description: "Environment being deployed"
+    Value: !Ref Environment
+  ApiGatewayEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${AppGateway}.execute-api.${AWS::Region}.amazonaws.com/status/ready"
+  BackendEndpoint:
+    Description: "Backend endpoint URL (public endpoint that should 200)"
+    Value: !Join ["", ["https://", !FindInMap [ParamsMap, !Ref Environment, backendDomain], "/status/ready"] ]
