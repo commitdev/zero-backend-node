@@ -115,8 +115,7 @@ fi
     kustomize build . | \
     sed "s|${EXT_HOSTNAME}|${MY_EXT_HOSTNAME}|g" | \
     sed "s|{{ DEV_NAMESPACE }}|${DEV_NAMESPACE}|g" | \
-    sed "s|DATABASE_NAME: ${DATABASE_NAME}|DATABASE_NAME: ${DEV_DATABASE_NAME}|g" > kustomizebuild
-    exit 1
+    sed "s|DATABASE_NAME: ${DATABASE_NAME}|DATABASE_NAME: ${DEV_DATABASE_NAME}|g"
     kubectl --context ${CLUSTER_CONTEXT} -n ${DEV_NAMESPACE} apply -f - ) || error_exit "Failed to apply kubernetes manifests"
 
 # Confirm deployment

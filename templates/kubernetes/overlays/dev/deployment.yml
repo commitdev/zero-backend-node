@@ -5,6 +5,9 @@ metadata:
 spec:
   template:
     spec:
+      # To enable the backend-service account, you can add an entry from infrastructure repo
+      # kubernetes/terraform/environments/stage/main.tf's application_policy_list for dev namespaces
+      serviceAccountName: default
       containers:
         - name: <% .Name %>
           image: <% index .Params `accountId` %>.dkr.ecr.<% index .Params `region` %>.amazonaws.com/<% .Name %>:last-deployed

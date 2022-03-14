@@ -23,7 +23,7 @@ metadata:
     # CORS
     ## to support both frontend origin and 'localhost', need 'configuration-snippet' implementation here, because 'cors-allow-origin' field doesn't support multiple originss yet.
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($http_origin ~* "^https?://((?:<% index .Params `stagingFrontendSubdomain` %><% index .Params `stagingHostRoot` %>)|(?:localhost))|(?:127.0.0.1))") {
+      if ($http_origin ~* "^https?:\/\/((?:<% index .Params `stagingFrontendSubdomain` %><% index .Params `stagingHostRoot` %>)|(?:localhost)|(?:127.0.0.1))") {
         set $cors "true";
       }
       if ($request_method = 'OPTIONS') {
@@ -52,7 +52,7 @@ metadata:
 
 spec:
   rules:
-  - host: {{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>
+  - host: "{{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>"
     http:
       paths:
         - path: /(.*)
@@ -66,5 +66,5 @@ spec:
           <%- end %>
   tls:
   - hosts:
-    - {{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>
+    - "{{ DEV_NAMESPACE }}.dev.<% index .Params `stagingHostRoot` %>"
     secretName: <% .Name %>-tls-secret
